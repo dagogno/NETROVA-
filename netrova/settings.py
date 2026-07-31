@@ -4,14 +4,9 @@ from decouple import config
 
 BASE_DIR = Path(__file__).resolve().parent.parent
 
-SECRET_KEY = config('SECRET_KEY', default='changez-moi-en-production-utilisez-une-vraie-cle')
-DEBUG = config('DEBUG', default=True, cast=bool)
-
-# Hosts de base depuis .env
-_base_hosts = config('ALLOWED_HOSTS', default='localhost,127.0.0.1').split(',')
-
-# Ajout automatique de ngrok et domaines courants
-ALLOWED_HOSTS = _base_hosts + ['*']
+SECRET_KEY = os.environ.get('SECRET_KEY', 'cle-temporaire-pour-test')
+DEBUG = False
+ALLOWED_HOSTS = ['dagogno.pythonanywhere.com']
 
 INSTALLED_APPS = [
     'dashboard.apps.DashboardConfig',  # Doit être AVANT django.contrib.admin pour surcharger les templates admin
