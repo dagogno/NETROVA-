@@ -1,0 +1,224 @@
+{% extends "admin/base_site.html" %}
+{% load static %}
+
+{% block content %}
+{% with s=netrova_stats %}
+<div class="nr-dashboard">
+
+  <div class="nr-dash-header">
+    <h1>Tableau de bord NETROVA</h1>
+    <p>Vue d'ensemble du réseau — {% now "d F Y" %}</p>
+  </div>
+
+  <!-- ═══ STAT CARDS ═══ -->
+  <div class="nr-stats-grid">
+
+    <div class="nr-stat-card nr-blue">
+      <div class="nr-stat-icon">👥</div>
+      <div class="nr-stat-body">
+        <div class="nr-stat-value">{{ s.nb_membres_total|default:0 }}</div>
+        <div class="nr-stat-label">Membres au total</div>
+        <div class="nr-stat-sub">+{{ s.nb_membres_7j|default:0 }} cette semaine</div>
+      </div>
+    </div>
+
+    <div class="nr-stat-card nr-gold">
+      <div class="nr-stat-icon">🪪</div>
+      <div class="nr-stat-body">
+        <div class="nr-stat-value">{{ s.nb_kyc_attente|default:0 }}</div>
+        <div class="nr-stat-label">KYC en attente</div>
+        <div class="nr-stat-sub">{{ s.nb_kyc_valide|default:0 }} vérifiés</div>
+      </div>
+    </div>
+
+    <div class="nr-stat-card nr-green">
+      <div class="nr-stat-icon">🛒</div>
+      <div class="nr-stat-body">
+        <div class="nr-stat-value">{{ s.nb_commandes_total|default:0 }}</div>
+        <div class="nr-stat-label">Commandes totales</div>
+        <div class="nr-stat-sub">{{ s.nb_commandes_soldees|default:0 }} soldées</div>
+      </div>
+    </div>
+
+    <div class="nr-stat-card nr-red">
+      <div class="nr-stat-icon">⚠️</div>
+      <div class="nr-stat-body">
+        <div class="nr-stat-value">{{ s.nb_commandes_retard|default:0 }}</div>
+        <div class="nr-stat-label">Commandes en retard</div>
+        <div class="nr-stat-sub">Pénalités à appliquer</div>
+      </div>
+    </div>
+
+    <div class="nr-stat-card nr-purple">
+      <div class="nr-stat-icon">💰</div>
+      <div class="nr-stat-body">
+        <div class="nr-stat-value">{{ s.revenu_mois|default:0 }} F</div>
+        <div class="nr-stat-label">Encaissé ce mois</div>
+        <div class="nr-stat-sub">Tous paiements confondus</div>
+      </div>
+    </div>
+
+    <div class="nr-stat-card nr-teal">
+      <div class="nr-stat-icon">🤝</div>
+      <div class="nr-stat-body">
+        <div class="nr-stat-value">{{ s.montant_commissions_attente|default:0 }} F</div>
+        <div class="nr-stat-label">Commissions à verser</div>
+        <div class="nr-stat-sub">{{ s.nb_commissions_attente|default:0 }} en attente</div>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- ═══ QUICK ACTIONS ═══ -->
+  <div class="nr-quick-actions">
+    <a href="{% url 'admin:membres_membre_changelist' %}?kyc_statut__exact=en_attente" class="nr-qa-btn">🪪 Vérifier les KYC</a>
+    <a href="{% url 'admin:commandes_commande_changelist' %}?statut__exact=en_retard" class="nr-qa-btn">⚠️ Voir les retards</a>
+    <a href="{% url 'admin:commandes_paiement_add' %}" class="nr-qa-btn nr-qa-primary">+ Enregistrer un paiement</a>
+    <a href="{% url 'admin:reseau_commission_changelist' %}?statut__exact=en_attente" class="nr-qa-btn">💰 Verser des commissions</a>
+    <a href="{% url 'membres:tableau_de_bord' %}" class="nr-qa-btn" target="_blank">🌐 Voir le site</a>
+  </div>
+
+  <!-- ═══ TWO COLUMN LAYOUT ═══ -->
+  <div class="nr-dash-grid">
+
+    <!-- LEFT: recent orders + KYC pending -->
+    <div class="nr-col">
+
+      <div class="nr-card">
+        <div class="nr-card-header">
+          <h3>🛒 Dernières commandes</h3>
+          <a href="{% url 'admin:commandes_commande_changelist' %}">Voir tout →</a>
+        </div>
+        <div class="nr-card-body">
+          {% if s.dernieres_commandes %}
+          <table class="nr-table">
+            <thead><tr><th>Membre</th><th>Pack</th><th>Montant</th><th>Statut</th></tr></thead>
+            <tbody>
+            {% for c in s.dernieres_commandes %}
+            <tr onclick="window.location='{% url 'admin:commandes_commande_change' c.pk %}'">
+              <td>{{ c.membre.nom_complet }}</td>
+              <td>Pack {{ c.pack.code }}</td>
+              <td>{{ c.montant_total }} F</td>
+              <td>
+                {% if c.statut == 'soldee' %}<span class="nr-badge nr-badge-green">Soldée</span>
+                {% elif c.statut == 'en_retard' %}<span class="nr-badge nr-badge-red">Retard</span>
+                {% elif c.statut == 'acompte_paye' %}<span class="nr-badge nr-badge-gold">Acompte</span>
+                {% else %}<span class="nr-badge nr-badge-gray">En attente</span>{% endif %}
+              </td>
+            </tr>
+            {% endfor %}
+            </tbody>
+          </table>
+          {% else %}
+          <p class="nr-empty">Aucune commande pour l'instant.</p>
+          {% endif %}
+        </div>
+      </div>
+
+      <div class="nr-card">
+        <div class="nr-card-header">
+          <h3>⚠️ Commandes en retard</h3>
+          <a href="{% url 'admin:commandes_commande_changelist' %}?statut__exact=en_retard">Voir tout →</a>
+        </div>
+        <div class="nr-card-body">
+          {% if s.commandes_en_retard %}
+          <table class="nr-table">
+            <thead><tr><th>Membre</th><th>Pack</th><th>Solde</th></tr></thead>
+            <tbody>
+            {% for c in s.commandes_en_retard %}
+            <tr onclick="window.location='{% url 'admin:commandes_commande_change' c.pk %}'">
+              <td>{{ c.membre.nom_complet }}</td>
+              <td>Pack {{ c.pack.code }}</td>
+              <td><span class="nr-badge nr-badge-red">{{ c.solde_restant }} F</span></td>
+            </tr>
+            {% endfor %}
+            </tbody>
+          </table>
+          {% else %}
+          <p class="nr-empty">✅ Aucun retard actuellement.</p>
+          {% endif %}
+        </div>
+      </div>
+
+    </div>
+
+    <!-- RIGHT: new members + KYC -->
+    <div class="nr-col">
+
+      <div class="nr-card">
+        <div class="nr-card-header">
+          <h3>🪪 KYC en attente de vérification</h3>
+          <a href="{% url 'admin:membres_membre_changelist' %}?kyc_statut__exact=en_attente">Voir tout →</a>
+        </div>
+        <div class="nr-card-body">
+          {% if s.membres_kyc_attente %}
+          <table class="nr-table">
+            <thead><tr><th>Membre</th><th>Téléphone</th><th></th></tr></thead>
+            <tbody>
+            {% for m in s.membres_kyc_attente %}
+            <tr onclick="window.location='{% url 'admin:membres_membre_change' m.pk %}'">
+              <td>{{ m.nom_complet }}</td>
+              <td>{{ m.telephone }}</td>
+              <td><span class="nr-badge nr-badge-gold">⏳ À vérifier</span></td>
+            </tr>
+            {% endfor %}
+            </tbody>
+          </table>
+          {% else %}
+          <p class="nr-empty">✅ Tous les KYC sont traités.</p>
+          {% endif %}
+        </div>
+      </div>
+
+      <div class="nr-card">
+        <div class="nr-card-header">
+          <h3>👥 Nouveaux membres</h3>
+          <a href="{% url 'admin:membres_membre_changelist' %}">Voir tout →</a>
+        </div>
+        <div class="nr-card-body">
+          {% if s.derniers_membres %}
+          <table class="nr-table">
+            <thead><tr><th>Nom</th><th>Zone</th><th>Score</th></tr></thead>
+            <tbody>
+            {% for m in s.derniers_membres %}
+            <tr onclick="window.location='{% url 'admin:membres_membre_change' m.pk %}'">
+              <td>{{ m.nom_complet }}</td>
+              <td>{{ m.zone }}</td>
+              <td><span class="nr-badge nr-badge-blue">{{ m.score_confiance }}/100</span></td>
+            </tr>
+            {% endfor %}
+            </tbody>
+          </table>
+          {% else %}
+          <p class="nr-empty">Aucun membre pour l'instant.</p>
+          {% endif %}
+        </div>
+      </div>
+
+      <div class="nr-card">
+        <div class="nr-card-header"><h3>📦 Accès rapide</h3></div>
+        <div class="nr-card-body nr-links-list">
+          <a href="{% url 'admin:membres_membre_changelist' %}">→ Tous les membres ({{ s.nb_membres_total }})</a>
+          <a href="{% url 'admin:produits_pack_changelist' %}">→ Gérer les packs ({{ s.nb_packs }})</a>
+          <a href="{% url 'admin:commandes_commande_changelist' %}">→ Toutes les commandes</a>
+          <a href="{% url 'admin:commandes_paiement_changelist' %}">→ Tous les paiements</a>
+          <a href="{% url 'admin:reseau_commission_changelist' %}">→ Toutes les commissions</a>
+          <a href="/membres-hierarchie/">→ Hiérarchie complète du réseau 🌳</a>
+          <a href="/cgu/" target="_blank">→ Lire les CGU officielles 📋</a>
+          {% if not user.membre %}
+          <div style="margin:8px 18px;background:#FCF0D6;border-radius:8px;padding:12px;font-size:13px;color:#7A5300;border:1px solid #F2D58E">
+            ⚠️ <strong>Votre compte admin n'a pas de profil membre.</strong><br>
+            Pour accéder au site public, exécutez :<br>
+            <code style="background:rgba(0,0,0,0.08);padding:2px 6px;border-radius:4px;font-size:12px">python manage.py creer_profil_membre --username {{ user.username }}</code>
+          </div>
+          {% endif %}
+        </div>
+      </div>
+
+    </div>
+  </div>
+</div>
+{% endwith %}
+{% endblock %}
+
+{% block sidebar %}{% endblock %}

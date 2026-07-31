@@ -1,0 +1,86 @@
+{% extends 'base.html' %}
+{% block title %}Mes commissions{% endblock %}
+{% block content %}
+<div class="dashboard">
+  <div class="dashboard-header">
+    <div>
+      <h1>💰 Mes commissions</h1>
+      <p>Taux actuel : <strong>{{ membre.taux_commission|floatformat:0 }}%</strong>
+         · Seuil 3% : <strong>10 filleuls directs actifs</strong></p>
+    </div>
+    <a href="{% url 'membres:mon_reseau' %}" class="btn-outline btn-sm">👥 Mon réseau</a>
+  </div>
+
+  <!-- Résumé financier -->
+  <div style="background:linear-gradient(150deg,var(--brand-deep),var(--brand));border-radius:var(--r-xl);padding:28px;margin-bottom:28px;display:flex;gap:28px;flex-wrap:wrap;box-shadow:var(--shadow-2)">
+    <div style="flex:1;min-width:140px;text-align:center">
+      <div style="font-size:30px;font-weight:800;color:var(--leaf-soft)">{{ membre.solde_commissions }} F</div>
+      <div style="color:rgba(255,255,255,0.6);font-size:12px;font-weight:700;text-transform:uppercase;margin-top:6px;letter-spacing:0.8px">En attente de versement</div>
+    </div>
+    <div style="width:1px;background:rgba(255,255,255,0.15)"></div>
+    <div style="flex:1;min-width:140px;text-align:center">
+      <div style="font-size:30px;font-weight:800;color:#fff">{{ membre.commissions_versees }} F</div>
+      <div style="color:rgba(255,255,255,0.6);font-size:12px;font-weight:700;text-transform:uppercase;margin-top:6px;letter-spacing:0.8px">Total versé</div>
+    </div>
+    <div style="width:1px;background:rgba(255,255,255,0.15)"></div>
+    <div style="flex:1;min-width:140px;text-align:center">
+      <div style="font-size:30px;font-weight:800;color:#fff">{{ membre.taux_commission|floatformat:0 }}%</div>
+      <div style="color:rgba(255,255,255,0.6);font-size:12px;font-weight:700;text-transform:uppercase;margin-top:6px;letter-spacing:0.8px">Taux ({{ membre.nombre_filleuls }} filleuls)</div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-header"><h3>Historique des commissions</h3></div>
+    <div class="card-body">
+      {% if commissions %}
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr><th>Date</th><th>Commande</th><th>Pack</th><th>Taux</th><th>Montant</th><th>Statut</th></tr>
+          </thead>
+          <tbody>
+          {% for c in commissions %}
+          <tr>
+            <td style="color:var(--ink-faint);font-size:13px">{{ c.date_calcul|date:"d/m/Y" }}</td>
+            <td><span style="color:var(--brand);font-weight:700">CMD-{{ c.commande.pk|stringformat:"04d" }}</span></td>
+            <td>Pack {{ c.commande.pack.code }}</td>
+            <td style="font-weight:600">{{ c.taux|floatformat:0 }}%</td>
+            <td style="font-weight:800;color:var(--leaf-deep)">{{ c.montant }} FCFA</td>
+            <td>
+              {% if c.statut == 'versee' %}
+                <span class="badge badge-green">✅ Versée<br><small>{{ c.date_versement|date:"d/m/Y" }}</small></span>
+              {% else %}
+                <span class="badge badge-yellow">⏳ En attente</span>
+              {% endif %}
+            </td>
+          </tr>
+          {% endfor %}
+          </tbody>
+        </table>
+      </div>
+      {% else %}
+      <div class="empty-state" style="padding:60px">
+        <div class="empty-icon">💰</div>
+        <h4>Aucune commission pour l'instant</h4>
+        <p>Les commissions sont générées automatiquement<br>quand vos filleuls soldent leurs commandes.</p>
+        <a href="{% url 'membres:mon_reseau' %}" class="btn-primary btn-sm">👥 Développer mon réseau</a>
+      </div>
+      {% endif %}
+    </div>
+  </div>
+
+  <div style="background:#FCF0D6;border:1px solid #F2D58E;border-radius:var(--r-lg);padding:18px 24px;margin-top:24px;display:flex;gap:14px;align-items:center">
+    <span style="font-size:26px">💡</span>
+    <div>
+      <strong style="color:#7A5300">Comment recevoir mes commissions ?</strong>
+      <p style="color:#7A5300;font-size:14px;margin-top:3px">
+        Contactez l'administrateur NETROVA via WhatsApp au <strong>+228 90 49 12 87</strong> pour demander le versement.
+      </p>
+    </div>
+    <a href="https://wa.me/22890491287?text=Bonjour%20NETROVA%2C%20je%20souhaite%20recevoir%20mes%20commissions%20en%20attente." target="_blank"
+       style="margin-left:auto;background:#1DBE5A;color:#fff;padding:10px 20px;border-radius:var(--r-sm);text-decoration:none;font-weight:700;font-size:13px;white-space:nowrap;flex-shrink:0">
+      💬 Demander le versement
+    </a>
+  </div>
+</div>
+{% endblock %}

@@ -1,0 +1,24 @@
+<div class="tree-node">
+  <div class="tree-card">
+    <div class="tree-avatar">{{ noeud.membre.nom_complet|slice:":1" }}</div>
+    <div class="tree-info">
+      <div class="tree-name">
+        {{ noeud.membre.nom_complet }}
+        {% if noeud.membre.kyc_statut == 'valide' %}<span title="Identité vérifiée">✅</span>{% endif %}
+      </div>
+      <div class="tree-meta">
+        <span>📞 {{ noeud.membre.telephone }}</span>
+        <span>👥 Équipe : {{ noeud.membre.taille_equipe_totale }}</span>
+        <span>📅 {{ noeud.membre.date_inscription|date:"d/m/Y" }}</span>
+      </div>
+    </div>
+  </div>
+
+  {% if noeud.filleuls %}
+  <div class="tree-children">
+    {% for enfant in noeud.filleuls %}
+      {% include "membres/_arbre_noeud.html" with noeud=enfant %}
+    {% endfor %}
+  </div>
+  {% endif %}
+</div>

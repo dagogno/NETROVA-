@@ -1,0 +1,49 @@
+{% extends 'base.html' %}
+{% block title %}Conditions Générales d'Utilisation{% endblock %}
+{% block content %}
+
+<!-- Bannière entête -->
+<div style="padding-top:70px;background:linear-gradient(160deg,#0A2660,#061337)">
+  <div style="max-width:800px;margin:0 auto;padding:56px 24px 44px">
+    <span class="section-tag light">Document officiel</span>
+    <h1 style="font-size:clamp(26px,4vw,42px);font-weight:800;color:#fff;margin-top:12px">
+      Conditions Générales d'Utilisation
+    </h1>
+    <p style="color:rgba(255,255,255,0.55);font-size:15px;margin-top:10px">
+      NETROVA — Réseau de confiance et d'opportunités · Lomé, Togo
+    </p>
+  </div>
+</div>
+
+<!-- Contenu CGU -->
+<div style="max-width:800px;margin:0 auto;padding:50px 24px 80px">
+
+  <!-- Sommaire -->
+  <div style="background:var(--cloud);border:1px solid var(--line);border-radius:var(--r-lg);padding:24px 28px;margin-bottom:40px">
+    <h3 style="font-size:14px;font-weight:800;color:var(--ink-faint);text-transform:uppercase;letter-spacing:1px;margin-bottom:14px">Sommaire</h3>
+    <div style="display:flex;flex-direction:column;gap:8px">
+      <a href="#presentation" style="color:var(--brand);text-decoration:none;font-size:14px;font-weight:600">1. Présentation</a>
+      <a href="#adhesion" style="color:var(--brand);text-decoration:none;font-size:14px;font-weight:600">2. Adhésion</a>
+      <a href="#services" style="color:var(--brand);text-decoration:none;font-size:14px;font-weight:600">3. Services Disponibles</a>
+      <a href="#packs" style="color:var(--brand);text-decoration:none;font-size:14px;font-weight:600">4. Règles du Programme Packs Alimentaires</a>
+      <a href="#responsabilites" style="color:var(--brand);text-decoration:none;font-size:14px;font-weight:600">5. Responsabilités des Membres</a>
+      <a href="#confidentialite" style="color:var(--brand);text-decoration:none;font-size:14px;font-weight:600">6. Politique de Confidentialité</a>
+      <a href="#limitation" style="color:var(--brand);text-decoration:none;font-size:14px;font-weight:600">7. Limitation de Responsabilité</a>
+    </div>
+  </div>
+
+  {% include "cgu_sections.html" %}
+
+  <!-- Acceptation / CTA -->
+  <div style="background:linear-gradient(150deg,var(--brand-deep),var(--brand));border-radius:var(--r-xl);padding:36px;text-align:center;margin-top:48px">
+    <h3 style="color:#fff;font-size:20px;font-weight:800">Vous acceptez ces conditions ?</h3>
+    <p style="color:rgba(255,255,255,0.65);font-size:14px;margin-top:8px;margin-bottom:24px">
+      En vous inscrivant sur NETROVA, vous confirmez avoir lu et accepté les présentes CGU.
+    </p>
+    <a href="{% url 'membres:inscription' %}" class="btn-wa-big" style="font-size:15px;padding:14px 32px;margin-top:0;background:var(--leaf)">
+      ✅ S'inscrire sur NETROVA
+    </a>
+  </div>
+
+</div>
+{% endblock %}

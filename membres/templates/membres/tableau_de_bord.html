@@ -1,0 +1,163 @@
+{% extends 'base.html' %}
+{% block title %}Tableau de bord{% endblock %}
+{% block content %}
+<div class="dashboard">
+
+  <!-- En-tête avec score de confiance -->
+  <div class="profile-header" style="margin-bottom:28px">
+    <div class="score-widget">
+      <div class="score-ring">
+        <svg viewBox="0 0 86 86">
+          <circle class="score-ring-bg" cx="43" cy="43" r="39"/>
+          <circle class="score-ring-fill" cx="43" cy="43" r="39"
+                  stroke-dasharray="{{ score_circumference }}"
+                  stroke-dashoffset="{{ score_offset }}"/>
+        </svg>
+        <div class="score-ring-text">
+          <div class="score-ring-num">{{ membre.score_confiance }}</div>
+          <div class="score-ring-sub">/ 100</div>
+        </div>
+      </div>
+      <div class="score-label-text">
+        <strong>Score de confiance : {{ score_label }}</strong>
+        <span>Bonjour, {{ membre.nom_complet }} 👋</span>
+      </div>
+    </div>
+    <div style="margin-left:auto;display:flex;flex-direction:column;align-items:flex-end;gap:8px">
+      {% if membre.kyc_statut == 'valide' %}
+        <span class="kyc-badge kyc-valide">✅ Identité vérifiée</span>
+      {% elif membre.kyc_statut == 'rejete' %}
+        <span class="kyc-badge kyc-rejete">❌ KYC rejeté — contactez-nous</span>
+      {% else %}
+        <span class="kyc-badge kyc-attente">⏳ Identité en cours de vérification</span>
+      {% endif %}
+      <span style="color:rgba(255,255,255,0.55);font-size:12px">Code parrainage : <strong style="color:#fff">{{ membre.code_parrainage }}</strong></span>
+    </div>
+  </div>
+
+  <!-- Statistiques -->
+  <div class="stats-grid">
+    <div class="stat-card">
+      <div class="stat-card-icon">🛒</div>
+      <div class="stat-card-value">{{ stats.nb_commandes }}</div>
+      <div class="stat-card-label">Commandes totales</div>
+    </div>
+    <div class="stat-card blue">
+      <div class="stat-card-icon">⏳</div>
+      <div class="stat-card-value">{{ stats.nb_en_cours }}</div>
+      <div class="stat-card-label">Commandes en cours</div>
+    </div>
+    <div class="stat-card green">
+      <div class="stat-card-icon">👥</div>
+      <div class="stat-card-value">{{ stats.nb_filleuls }}</div>
+      <div class="stat-card-label">Filleuls actifs</div>
+    </div>
+    <div class="stat-card gold">
+      <div class="stat-card-icon">💰</div>
+      <div class="stat-card-value">{{ stats.solde_commissions|default:"0" }} F</div>
+      <div class="stat-card-label">Commissions en attente</div>
+    </div>
+  </div>
+
+  <div class="dashboard-grid">
+
+    <!-- Dernières commandes -->
+    <div class="card">
+      <div class="card-header">
+        <h3>🛒 Mes dernières commandes</h3>
+        <a href="{% url 'commandes:mes_commandes' %}" class="btn-outline btn-sm">Voir tout</a>
+      </div>
+      <div class="card-body">
+        {% if commandes %}
+        <div class="table-wrap">
+          <table>
+            <thead><tr><th>Réf.</th><th>Pack</th><th>Total</th><th>Versé</th><th>Statut</th></tr></thead>
+            <tbody>
+            {% for cmd in commandes %}
+            <tr>
+              <td><a href="{% url 'commandes:detail' cmd.pk %}">CMD-{{ cmd.pk|stringformat:"04d" }}</a></td>
+              <td>Pack {{ cmd.pack.code }}</td>
+              <td>{{ cmd.montant_total }} F</td>
+              <td>{{ cmd.montant_verse }} F</td>
+              <td>
+                {% if cmd.statut == 'soldee' %}<span class="badge badge-green">Soldée</span>
+                {% elif cmd.statut == 'acompte_paye' %}<span class="badge badge-yellow">Acompte payé</span>
+                {% elif cmd.statut == 'en_retard' %}<span class="badge badge-red">En retard</span>
+                {% elif cmd.statut == 'annulee' %}<span class="badge badge-gray">Annulée</span>
+                {% else %}<span class="badge badge-blue">En attente</span>{% endif %}
+              </td>
+            </tr>
+            {% endfor %}
+            </tbody>
+          </table>
+        </div>
+        {% else %}
+        <div class="empty-state">
+          <div class="empty-icon">🛒</div>
+          <h4>Aucune commande</h4>
+          <p>Vous n'avez pas encore passé de commande.</p>
+          <a href="{% url 'produits:catalogue' %}" class="btn-primary btn-sm">Voir les packs</a>
+        </div>
+        {% endif %}
+      </div>
+    </div>
+
+    <!-- Réseau & commissions -->
+    <div style="display:flex;flex-direction:column;gap:20px">
+
+      <!-- Code parrainage -->
+      <div class="card">
+        <div class="card-header"><h3>🔗 Mon lien de parrainage</h3></div>
+        <div class="card-body-pad">
+          <div class="ref-box">
+            <div class="ref-code">{{ membre.code_parrainage }}</div>
+            <div class="ref-link" id="refLink">/membres/inscription/?ref={{ membre.code_parrainage }}</div>
+          </div>
+          <button class="btn-copy" onclick="copyRef()">📋 Copier le lien</button>
+        </div>
+      </div>
+
+      <!-- Filleuls -->
+      <div class="card">
+        <div class="card-header">
+          <h3>👥 Mon réseau ({{ stats.nb_filleuls }})</h3>
+          <a href="{% url 'membres:mon_reseau' %}" class="btn-outline btn-sm">Voir l'arbre</a>
+        </div>
+        <div class="card-body">
+          {% if filleuls %}
+          <table>
+            <tbody>
+            {% for f in filleuls %}
+            <tr>
+              <td>{{ f.nom_complet }}</td>
+              <td style="color:var(--ink-faint);font-size:12px">{{ f.date_inscription|date:"d/m/Y" }}</td>
+            </tr>
+            {% endfor %}
+            </tbody>
+          </table>
+          {% else %}
+          <div class="empty-state" style="padding:24px">
+            <p>Aucun filleul pour l'instant.<br>Partagez votre code !</p>
+          </div>
+          {% endif %}
+        </div>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+{% block extra_js %}
+<script>
+function copyRef() {
+  const base = window.location.origin;
+  const link = base + '/membres/inscription/?ref={{ membre.code_parrainage }}';
+  navigator.clipboard.writeText(link).then(() => {
+    const btn = document.querySelector('.btn-copy');
+    btn.textContent = '✅ Copié !';
+    setTimeout(() => btn.textContent = '📋 Copier le lien', 2000);
+  });
+}
+</script>
+{% endblock %}
+{% endblock %}

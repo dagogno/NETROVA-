@@ -1,0 +1,63 @@
+{% extends 'base.html' %}
+{% block title %}Nos packs{% endblock %}
+{% block content %}
+<div style="padding-top:70px;background:linear-gradient(160deg,#0A2660,#061337)">
+  <div style="max-width:1240px;margin:0 auto;padding:64px 24px 50px;text-align:center">
+    <span class="section-tag light">7 packs disponibles</span>
+    <h1 style="font-size:clamp(28px,5vw,52px);font-weight:800;color:#fff;margin-top:14px">
+      Nos packs communautaires
+    </h1>
+    <p style="color:rgba(255,255,255,0.6);font-size:16px;margin-top:14px;max-width:520px;margin-left:auto;margin-right:auto">
+      Riz, huile, macaroni, sardines, lait, milo, sucre, couscous…<br>
+      Pour tous les besoins, pour toutes les familles.
+    </p>
+  </div>
+</div>
+
+<div style="max-width:1240px;margin:0 auto;padding:48px 24px 80px">
+
+  <!-- Bannière conditions -->
+  <div class="cond-banner">
+    <span class="cond-banner-icon">📋</span>
+    <div>
+      <strong>Avant de commander :</strong>
+      <p>Acompte de 50% requis, solde réglable sous 30 jours. Cliquez sur "Commander" pour voir le détail des conditions.</p>
+    </div>
+  </div>
+
+  <div class="packs-grid">
+  {% for pack in packs %}
+    <div class="pack-card {% if pack.code == '3A' %}featured{% endif %}">
+      <div class="pack-header pack-{{ pack.code|lower }}">
+        <div class="pack-label">Pack {{ pack.code }}{% if pack.code == '3A' %} ⭐{% endif %}</div>
+        <div class="pack-price">{{ pack.prix_formate }} <span>FCFA</span></div>
+        {% if pack.note_quantite %}<div class="pack-badge">{{ pack.note_quantite }}</div>{% endif %}
+      </div>
+      <div class="pack-body">
+        <ul class="pack-items">
+          {% for comp in pack.composants_liste %}
+          <li>{% if comp.emoji %}{{ comp.emoji }}{% endif %} {{ comp.nom }}</li>
+          {% endfor %}
+        </ul>
+        <div class="pack-actions">
+          <a href="#" class="btn-whatsapp" onclick="return netrovaOpenCondModal('{{ pack.code }}', '{{ pack.prix_formate }}', '{{ pack.lien_whatsapp }}')">💬 Commander</a>
+          <a href="{% url 'produits:detail' pack.code %}" class="btn-detail">Détails</a>
+        </div>
+      </div>
+    </div>
+  {% endfor %}
+  </div>
+
+  <div style="background:linear-gradient(160deg,#0A2660,#061337);border-radius:28px;padding:42px;text-align:center;margin-top:48px">
+    <h2 style="color:#fff;font-size:24px;font-weight:800">
+      Vous ne savez pas quel pack choisir ?
+    </h2>
+    <p style="color:rgba(255,255,255,0.6);margin-top:8px;margin-bottom:24px">
+      Contactez-nous sur WhatsApp, nous vous guiderons selon vos besoins et votre budget.
+    </p>
+    <a href="https://wa.me/22890491287?text=Bonjour%20NETROVA%2C%20j%27ai%20besoin%20d%27aide%20pour%20choisir%20un%20pack." target="_blank" class="btn-wa-big" style="font-size:16px;padding:14px 32px;margin-top:0">
+      💬 Nous demander conseil
+    </a>
+  </div>
+</div>
+{% endblock %}
