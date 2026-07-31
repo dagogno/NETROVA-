@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 # NETROVA – Site Web Communautaire
 
 > Réseau de confiance et d'opportunités · Lomé, Togo
@@ -324,3 +325,6 @@ python manage.py migrate
 | Hiérarchie réseau (admin) | http://127.0.0.1:8000/membres-hierarchie/ |
 | Tableau de bord | http://127.0.0.1:8000/membres/tableau-de-bord/ |
 | Mon réseau (arbre) | http://127.0.0.1:8000/membres/mon-reseau/ |
+=======
+# NETROVA-
+>>>>>>> c1a914da955ee5b686e1b82b4e9c15b092bb2fa8
