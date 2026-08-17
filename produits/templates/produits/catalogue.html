@@ -1,0 +1,117 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block title %}Nos packs{% endblock %}
+{% block content %}
+<div style="padding-top:70px;background:linear-gradient(160deg,#0A2660,#061337)">
+  <div style="max-width:1240px;margin:0 auto;padding:64px 24px 48px;text-align:center">
+    <span class="section-tag light">7 packs disponibles</span>
+    <h1 style="font-size:clamp(28px,5vw,52px);font-weight:800;color:#fff;margin-top:12px">
+      Nos packs communautaires
+    </h1>
+    <p style="color:rgba(255,255,255,0.6);font-size:16px;margin-top:12px;max-width:520px;margin-left:auto;margin-right:auto">
+      Riz, huile, macaroni, sardines, lait, milo, sucre, couscous…<br>
+      Pour tous les besoins, pour toutes les familles.
+    </p>
+  </div>
+</div>
+
+<div style="max-width:1240px;margin:0 auto;padding:48px 24px 80px">
+
+  <!-- Bannière paiement comptant -->
+  <div style="background:linear-gradient(145deg,#DFF7E9,#F3FBF6);border:1.5px solid #A8E6C2;border-radius:var(--r-lg);padding:20px 26px;margin-bottom:32px;display:flex;align-items:center;gap:16px;flex-wrap:wrap">
+    <span style="font-size:32px">💵</span>
+    <div style="flex:1;min-width:240px">
+      <strong style="color:#0E5A30;font-size:15px">Paiement comptant = 2% de réduction + livraison gratuite !</strong>
+      <p style="color:#176B3B;font-size:13px;margin-top:3px">Payez tout d'un coup, sans acompte, sans condition. Réduction immédiate appliquée au total.</p>
+    </div>
+    <div style="background:rgba(255,255,255,0.18);border:1px solid rgba(255,255,255,0.3);border-radius:var(--r-sm);padding:4px">
+      <div style="display:flex;background:rgba(255,255,255,0.9);border-radius:7px;overflow:hidden">
+        <button id="modeCreditBtn" onclick="setMode('credit')"
+          style="padding:8px 18px;font-size:13px;font-weight:700;border:none;cursor:pointer;transition:all 0.2s;background:var(--brand);color:#fff;border-radius:7px">
+          À crédit
+        </button>
+        <button id="modeComptantBtn" onclick="setMode('comptant')"
+          style="padding:8px 18px;font-size:13px;font-weight:700;border:none;cursor:pointer;transition:all 0.2s;background:transparent;color:var(--ink-soft);border-radius:7px">
+          Comptant 💵
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <div class="packs-grid">
+  {% for pack in packs %}
+    <div class="pack-card {% if pack.code == '3A' %}featured{% endif %}">
+      <div class="pack-header pack-{{ pack.code|lower }}">
+        <div class="pack-label">Pack {{ pack.code }}{% if pack.code == '3A' %} ⭐{% endif %}</div>
+        <!-- Prix crédit -->
+        <div class="pack-price mode-credit">{{ pack.prix_formate }} <span>FCFA</span></div>
+        <!-- Prix comptant avec remise -->
+        <div class="pack-price mode-comptant" style="display:none">
+          {{ pack.prix_comptant_formate }} <span>FCFA</span>
+          <div style="font-size:11px;opacity:0.85;font-weight:600;margin-top:2px">
+            <del style="opacity:0.6">{{ pack.prix_formate }} F</del> — Remise 2% 🎁
+          </div>
+        </div>
+        {% if pack.note_quantite %}<div class="pack-badge">{{ pack.note_quantite }}</div>{% endif %}
+      </div>
+      <div class="pack-body">
+        <ul class="pack-items">
+          {% for comp in pack.composants_liste %}
+          <li>{% if comp.emoji %}{{ comp.emoji }}{% endif %} {{ comp.nom }}</li>
+          {% endfor %}
+        </ul>
+        <!-- Bouton crédit (modal conditions) -->
+        <div class="mode-credit">
+          <a href="#" class="btn-whatsapp"
+             onclick="return netrovaOpenCondModal('{{ pack.code }}', '{{ pack.prix_formate }}', '{{ pack.lien_whatsapp }}')">
+            💳 Crédit (50% acompte)
+          </a>
+        </div>
+        <!-- Bouton comptant (pas de modal, direct WhatsApp) -->
+        <div class="mode-comptant" style="display:none">
+          <a href="{{ pack.lien_whatsapp_comptant }}" target="_blank" class="btn-whatsapp" style="background:#16914E">
+            💵 Payer comptant — {{ pack.prix_comptant_formate }} F
+          </a>
+        </div>
+        <div style="margin-top:8px">
+          <a href="{% url 'produits:detail' pack.code %}" class="btn-detail" style="width:100%;text-align:center">Voir le détail</a>
+        </div>
+      </div>
+    </div>
+  {% endfor %}
+  </div>
+
+  <!-- Info livraison comptant -->
+  <div class="mode-comptant" style="display:none">
+    <div style="background:#DFF7E9;border:1px solid #A8E6C2;border-radius:var(--r-lg);padding:18px 24px;margin-top:28px;display:flex;gap:12px;align-items:center">
+      <span style="font-size:24px">🛵</span>
+      <div>
+        <strong style="color:#0E5A30">Livraison GRATUITE sur votre 1ère commande comptant</strong>
+        <p style="color:#176B3B;font-size:13px;margin-top:3px">Zone couverte : Baguida – Lomé et environs. Disponible le samedi après-midi.</p>
+      </div>
+    </div>
+  </div>
+
+  <div style="background:linear-gradient(160deg,#0A2660,#061337);border-radius:28px;padding:42px;text-align:center;margin-top:48px">
+    <h2 style="color:#fff;font-size:22px;font-weight:800">Pas sûr de votre choix ?</h2>
+    <p style="color:rgba(255,255,255,0.6);margin-top:8px;margin-bottom:22px;font-size:14px">Contactez-nous sur WhatsApp, nous vous guidons en quelques secondes.</p>
+    <a href="https://wa.me/22890491287?text=Bonjour%20NETROVA%2C%20j%27ai%20besoin%20d%27aide%20pour%20choisir%20un%20pack." target="_blank" class="btn-wa-big" style="font-size:15px;padding:13px 30px;margin-top:0">
+      💬 Nous demander conseil
+    </a>
+  </div>
+</div>
+
+{% block extra_js %}
+<script>
+function setMode(mode) {
+  const isComptant = mode === 'comptant';
+  document.querySelectorAll('.mode-credit').forEach(el => el.style.display = isComptant ? 'none' : '');
+  document.querySelectorAll('.mode-comptant').forEach(el => el.style.display = isComptant ? '' : 'none');
+  document.getElementById('modeCreditBtn').style.background   = isComptant ? 'transparent' : 'var(--brand)';
+  document.getElementById('modeCreditBtn').style.color        = isComptant ? 'var(--ink-soft)' : '#fff';
+  document.getElementById('modeComptantBtn').style.background = isComptant ? 'var(--leaf)' : 'transparent';
+  document.getElementById('modeComptantBtn').style.color      = isComptant ? '#fff' : 'var(--ink-soft)';
+}
+</script>
+{% endblock %}
+{% endblock %}

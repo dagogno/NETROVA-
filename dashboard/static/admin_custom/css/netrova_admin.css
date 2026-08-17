@@ -1,0 +1,161 @@
+/* ════════════════════════════════════════
+   NETROVA — Thème admin personnalisé
+   ════════════════════════════════════════ */
+
+:root {
+  --nr-blue-dark:  #0B2A6B;
+  --nr-blue:       #1A4DB5;
+  --nr-blue-light: #3C73D4;
+  --nr-green:      #16914E;
+  --nr-gold:       #F0A500;
+  --nr-red:        #E74C3C;
+  --nr-purple:     #7B2AA0;
+  --nr-teal:       #0D9488;
+  --nr-bg:         #F4F7FF;
+  --nr-border:     #E1E8F7;
+  --nr-text:       #0D1B3E;
+  --nr-text-mid:   #4A5A82;
+
+  /* Override Django admin's default palette */
+  --primary: var(--nr-blue);
+  --primary-fg: #fff;
+  --header-color: #fff;
+  --header-bg: var(--nr-blue-dark);
+  --header-link-color: #fff;
+  --header-branding-color: #fff;
+  --link-fg: var(--nr-blue);
+  --link-hover-color: var(--nr-blue-light);
+  --link-selected-fg: var(--nr-blue);
+  --selected-bg: #EAF0FE;
+  --selected-row: #EAF0FE;
+  --button-bg: var(--nr-blue);
+  --button-hover-bg: var(--nr-blue-light);
+  --default-button-bg: var(--nr-green);
+  --default-button-hover-bg: #1AAE5C;
+  --close-button-bg: #888;
+  --font-family-primary: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+  --body-fg: var(--nr-text);
+  --body-quiet-color: var(--nr-text-mid);
+  --breadcrumbs-fg: rgba(255,255,255,0.7);
+  --breadcrumbs-bg: var(--nr-blue);
+}
+
+body { background: var(--nr-bg); font-family: var(--font-family-primary); }
+
+/* ── Branding ── */
+.netrova-branding a { display: flex; align-items: center; gap: 10px; text-decoration: none; }
+.netrova-logo-mark {
+  width: 32px; height: 32px; border-radius: 8px;
+  background: linear-gradient(135deg, var(--nr-blue-light), var(--nr-green));
+  display: flex; align-items: center; justify-content: center;
+  font-weight: 800; color: #fff; font-size: 16px; flex-shrink: 0;
+}
+.netrova-logo-text { font-weight: 700; font-size: 18px; color: #fff; }
+.netrova-logo-text small { font-weight: 400; opacity: 0.7; font-size: 12px; }
+
+#header { box-shadow: 0 2px 12px rgba(0,0,0,0.12); }
+div.breadcrumbs { background: var(--nr-blue); }
+
+/* ── Modules / changelist polish ── */
+.module h2, .module caption, .inline-group h2 {
+  background: var(--nr-blue); border-radius: 6px 6px 0 0;
+}
+#changelist-filter { border-radius: 10px; border: 1px solid var(--nr-border); }
+#changelist-filter h2 { border-radius: 10px 10px 0 0; }
+
+.button, input[type=submit], input[type=button], .submit-row input, a.button {
+  border-radius: 8px !important;
+}
+
+#content { padding: 24px 28px; }
+
+/* ════════════ CUSTOM DASHBOARD ════════════ */
+.nr-dashboard { max-width: 1280px; }
+
+.nr-dash-header { margin-bottom: 24px; }
+.nr-dash-header h1 { font-size: 26px; font-weight: 800; color: var(--nr-text); margin: 0; }
+.nr-dash-header p { color: var(--nr-text-mid); margin-top: 4px; }
+
+/* Stat cards */
+.nr-stats-grid {
+  display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 16px; margin-bottom: 24px;
+}
+.nr-stat-card {
+  background: #fff; border-radius: 14px; padding: 18px 20px;
+  display: flex; align-items: flex-start; gap: 14px;
+  border: 1px solid var(--nr-border); box-shadow: 0 2px 10px rgba(11,42,107,0.05);
+  border-left: 4px solid var(--nr-blue);
+}
+.nr-stat-card.nr-blue   { border-left-color: var(--nr-blue); }
+.nr-stat-card.nr-green  { border-left-color: var(--nr-green); }
+.nr-stat-card.nr-gold   { border-left-color: var(--nr-gold); }
+.nr-stat-card.nr-red    { border-left-color: var(--nr-red); }
+.nr-stat-card.nr-purple { border-left-color: var(--nr-purple); }
+.nr-stat-card.nr-teal   { border-left-color: var(--nr-teal); }
+.nr-stat-icon { font-size: 26px; line-height: 1; }
+.nr-stat-value { font-size: 24px; font-weight: 800; color: var(--nr-text); line-height: 1.1; }
+.nr-stat-label { font-size: 12px; font-weight: 600; color: var(--nr-text-mid); text-transform: uppercase; letter-spacing: 0.4px; margin-top: 4px; }
+.nr-stat-sub { font-size: 12px; color: #8C9BC2; margin-top: 3px; }
+
+/* Quick actions */
+.nr-quick-actions { display: flex; flex-wrap: wrap; gap: 10px; margin-bottom: 28px; }
+.nr-qa-btn {
+  display: inline-flex; align-items: center; gap: 6px;
+  background: #fff; border: 1.5px solid var(--nr-border); color: var(--nr-text);
+  padding: 9px 16px; border-radius: 9px; font-size: 13px; font-weight: 600;
+  text-decoration: none; transition: all 0.15s;
+}
+.nr-qa-btn:hover { border-color: var(--nr-blue); color: var(--nr-blue); transform: translateY(-1px); }
+.nr-qa-btn.nr-qa-primary { background: var(--nr-blue); color: #fff; border-color: var(--nr-blue); }
+.nr-qa-btn.nr-qa-primary:hover { background: var(--nr-blue-light); color: #fff; }
+
+/* Two column grid */
+.nr-dash-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+.nr-col { display: flex; flex-direction: column; gap: 20px; }
+
+.nr-card { background: #fff; border-radius: 14px; border: 1px solid var(--nr-border); overflow: hidden; box-shadow: 0 2px 10px rgba(11,42,107,0.05); }
+.nr-card-header { padding: 14px 18px; border-bottom: 1px solid var(--nr-border); display: flex; align-items: center; justify-content: space-between; }
+.nr-card-header h3 { margin: 0; font-size: 14px; font-weight: 700; color: var(--nr-text); }
+.nr-card-header a { font-size: 12px; color: var(--nr-blue); text-decoration: none; font-weight: 600; }
+.nr-card-body { padding: 4px 0; }
+.nr-empty { padding: 24px 18px; color: #93A1C4; font-size: 13px; text-align: center; margin: 0; }
+
+.nr-table { width: 100%; border-collapse: collapse; font-size: 13px; }
+.nr-table th { text-align: left; padding: 8px 18px; font-size: 10px; font-weight: 700; color: #93A1C4; text-transform: uppercase; letter-spacing: 0.4px; }
+.nr-table td { padding: 10px 18px; border-top: 1px solid #F0F3FA; }
+.nr-table tr { cursor: pointer; transition: background 0.1s; }
+.nr-table tr:hover td { background: #F7F9FF; }
+
+.nr-badge { display: inline-block; padding: 2px 10px; border-radius: 100px; font-size: 11px; font-weight: 700; }
+.nr-badge-green { background: #d4f4e2; color: #0f5132; }
+.nr-badge-red    { background: #fde8e8; color: #8b1c1c; }
+.nr-badge-gold   { background: #fff3cd; color: #7c5e00; }
+.nr-badge-gray   { background: #eef1f8; color: #5a6a8f; }
+.nr-badge-blue   { background: #dbeafe; color: #1e3a5f; }
+
+.nr-links-list { display: flex; flex-direction: column; padding: 8px 0; }
+.nr-links-list a { padding: 10px 18px; color: var(--nr-text-mid); text-decoration: none; font-size: 13px; font-weight: 500; transition: all 0.1s; }
+.nr-links-list a:hover { background: #F7F9FF; color: var(--nr-blue); padding-left: 22px; }
+
+@media (max-width: 900px) {
+  .nr-dash-grid { grid-template-columns: 1fr; }
+}
+
+/* ════════════ HIERARCHY TREE PAGE ════════════ */
+.nr-tree-page { max-width: 1100px; }
+.nr-tree-node { margin-left: 0; }
+.nr-tree-card {
+  background: #fff; border: 1px solid var(--nr-border); border-radius: 10px;
+  padding: 12px 16px; margin: 6px 0; display: flex; align-items: center;
+  gap: 12px; box-shadow: 0 1px 4px rgba(11,42,107,0.04);
+}
+.nr-tree-avatar {
+  width: 36px; height: 36px; border-radius: 50%; background: var(--nr-blue);
+  color: #fff; display: flex; align-items: center; justify-content: center;
+  font-weight: 700; font-size: 14px; flex-shrink: 0;
+}
+.nr-tree-info { flex: 1; }
+.nr-tree-name { font-weight: 700; font-size: 13px; color: var(--nr-text); }
+.nr-tree-meta { font-size: 12px; color: var(--nr-text-mid); margin-top: 2px; }
+.nr-tree-children { margin-left: 32px; padding-left: 16px; border-left: 2px dashed var(--nr-border); }

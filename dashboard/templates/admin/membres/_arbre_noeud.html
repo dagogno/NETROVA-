@@ -1,0 +1,25 @@
+{% load static %}
+<div class="nr-tree-node">
+  <div class="nr-tree-card" onclick="window.location='{% url 'admin:membres_membre_change' noeud.membre.pk %}'" style="cursor:pointer">
+    <div class="nr-tree-avatar">{{ noeud.membre.nom_complet|slice:":1" }}</div>
+    <div class="nr-tree-info">
+      <div class="nr-tree-name">{{ noeud.membre.nom_complet }}
+        {% if noeud.membre.kyc_statut == 'valide' %}<span title="KYC vérifié">✅</span>{% endif %}
+      </div>
+      <div class="nr-tree-meta">
+        📞 {{ noeud.membre.telephone }} · 📍 {{ noeud.membre.zone }} ·
+        Code: <strong>{{ noeud.membre.code_parrainage }}</strong> ·
+        Score: <strong>{{ noeud.membre.score_confiance }}/100</strong> ·
+        {{ noeud.filleuls|length }} filleul{{ noeud.filleuls|length|pluralize }} direct{{ noeud.filleuls|length|pluralize }}
+      </div>
+    </div>
+  </div>
+
+  {% if noeud.filleuls %}
+  <div class="nr-tree-children">
+    {% for enfant in noeud.filleuls %}
+      {% include "admin/membres/_arbre_noeud.html" with noeud=enfant %}
+    {% endfor %}
+  </div>
+  {% endif %}
+</div>

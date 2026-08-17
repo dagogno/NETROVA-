@@ -1,0 +1,199 @@
+<!DOCTYPE html>
+<html lang="fr">
+{% load static %}
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>{% block title %}NETROVA{% endblock %} — Réseau de confiance</title>
+  <link rel="icon" type="image/png" href="{% static 'images/favicon.png' %}">
+  <link rel="apple-touch-icon" href="{% static 'icons/icon-192x192.png' %}">
+  <link rel="manifest" href="/static/manifest.json">
+  <meta name="theme-color" content="#0A2660">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-title" content="NETROVA"> – Réseau de confiance et d'opportunités</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com"/>
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+  {% load static %}
+  <link rel="stylesheet" href="{% static 'css/netrova.css' %}"/>
+  {% block extra_css %}{% endblock %}
+</head>
+<body>
+
+<!-- ── NAVBAR ── -->
+<nav class="navbar">
+  <div class="navbar-inner">
+    <a href="{% url 'accueil' %}" class="nav-logo">
+      <img src="{% static 'images/logo.png' %}" alt="NETROVA" style="height:38px;width:auto;object-fit:contain">
+    </a>
+
+    <ul class="nav-links" id="navLinks">
+      <li><a href="{% url 'accueil' %}#valeurs">Nos valeurs</a></li>
+      <li><a href="{% url 'produits:catalogue' %}">Nos packs</a></li>
+      <li><a href="{% url 'partenaires:liste' %}">Partenaires</a></li>
+      {% if user.is_authenticated %}
+      <li><a href="{% url 'membres:tableau_de_bord' %}">Tableau de bord</a></li>
+      <li><a href="{% url 'commandes:mes_commandes' %}">Mes commandes</a></li>
+      <li><a href="{% url 'membres:mon_reseau' %}">Mon réseau</a></li>
+      {% endif %}
+    </ul>
+
+    <div class="nav-actions">
+      {% if user.is_authenticated %}
+        <span class="nav-user">👤 {{ user.get_full_name|default:user.username }}</span>
+        <a href="{% url 'membres:deconnexion' %}" class="btn-nav-outline">Déconnexion</a>
+      {% else %}
+        <a href="{% url 'membres:connexion' %}" class="btn-nav-outline">Connexion</a>
+        <a href="{% url 'membres:inscription' %}" class="btn-nav-primary">Rejoindre</a>
+      {% endif %}
+    </div>
+    <button class="nav-toggle" onclick="document.getElementById('navLinks').classList.toggle('open')" aria-label="Menu">
+      <span></span><span></span><span></span>
+    </button>
+  </div>
+</nav>
+
+<!-- ── MESSAGES FLASH ── -->
+{% if messages %}
+<div class="flash-messages">
+  {% for message in messages %}
+  <div class="flash flash-{{ message.tags }}">
+    {{ message }}
+    <button onclick="this.parentElement.remove()" class="flash-close">✕</button>
+  </div>
+  {% endfor %}
+</div>
+{% endif %}
+
+<!-- ── CONTENU ── -->
+<main>
+{% block content %}{% endblock %}
+</main>
+
+<!-- ── FOOTER ── -->
+<footer class="footer">
+  <div class="footer-inner">
+    <div class="footer-logo">
+      <div class="nav-logo-icon" style="width:36px;height:36px;font-size:18px;">N</div>
+      <div>
+        <strong>NETROVA</strong>
+        <p>Réseau de confiance et d'opportunités</p>
+      </div>
+    </div>
+    <div class="footer-links">
+      <a href="{% url 'produits:catalogue' %}">Nos packs</a>
+      <a href="{% url 'membres:inscription' %}">Rejoindre</a>
+      <a href="{% url 'cgu' %}">CGU</a>
+      <a href="https://wa.me/22890491287" target="_blank">WhatsApp</a>
+    </div>
+    <div class="footer-contact">
+      <p>📞 +228 90 49 12 87</p>
+      <p>📍 Baguida – Lomé, Togo</p>
+    </div>
+  </div>
+  <div class="footer-bottom">
+    <p>© {% now "Y" %} NETROVA. Tous droits réservés. — <em>Plus qu'un réseau, une famille !</em></p>
+  </div>
+</footer>
+
+<!-- ══════════════ MODAL : CONDITIONS AVANT COMMANDE ══════════════ -->
+<div class="cond-modal-overlay" id="condModalOverlay">
+  <div class="cond-modal">
+    <div class="cond-modal-head">
+      <h3>📋 Conditions de commande NETROVA</h3>
+      <p>Veuillez lire et accepter avant de continuer.</p>
+    </div>
+    <div class="cond-modal-pack" id="condModalPackInfo">Pack — 0 FCFA</div>
+    <div class="cond-modal-body">
+      <ul>
+        <li>
+          <span class="ico">💳</span>
+          <div><strong>Acompte de 50% obligatoire.</strong> Vous verserez la moitié du montant à la commande. NETROVA livre le pack après réception de cet acompte.</div>
+        </li>
+        <li>
+          <span class="ico">📅</span>
+          <div><strong>Solde dans le délai indiqué.</strong> Le montant restant doit être réglé dans le délai convenu lors de la commande (généralement 30 jours).</div>
+        </li>
+        <li>
+          <span class="ico">⚠️</span>
+          <div><strong>Pénalités de retard.</strong> En cas de retard de paiement, des pénalités peuvent être appliquées et votre accès futur au crédit peut être suspendu.</div>
+        </li>
+        <li>
+          <span class="ico">🤝</span>
+          <div><strong>Engagement d'honnêteté.</strong> En commandant, vous confirmez agir de bonne foi et vous engagez à respecter les délais de paiement.</div>
+        </li>
+        <li>
+          <span class="ico">💬</span>
+          <div><strong>Traitement manuel via WhatsApp.</strong> Votre commande est confirmée et votre paiement enregistré par notre équipe au <strong>+228 90 49 12 87</strong>.</div>
+        </li>
+        <li>
+          <span class="ico">🔒</span>
+          <div><strong>Vos données sont protégées.</strong> Vos informations sont utilisées uniquement pour gérer votre commande et ne sont jamais revendues.</div>
+        </li>
+      </ul>
+      <p style="margin-top:16px;font-size:12px;color:var(--ink-faint)">
+        Pour lire les conditions complètes :
+        <a href="/cgu/" target="_blank" style="color:var(--brand);font-weight:700">Conditions Générales d'Utilisation de NETROVA →</a>
+      </p>
+    </div>
+    <div class="cond-modal-foot">
+      <div class="cond-modal-check">
+        <input type="checkbox" id="condModalCheckbox" onchange="netrovaToggleConfirm()">
+        <label for="condModalCheckbox">
+          J'ai lu et j'accepte les conditions de commande et de paiement NETROVA,
+          notamment l'acompte de 50%, le délai de règlement du solde et les pénalités de retard.
+        </label>
+      </div>
+      <div class="cond-modal-actions">
+        <button type="button" class="btn-cancel" onclick="netrovaCloseCondModal()">Annuler</button>
+        <a href="#" target="_blank" class="btn-confirm" id="condModalConfirmBtn" onclick="netrovaCloseCondModal()">💬 Commander sur WhatsApp</a>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+function netrovaOpenCondModal(packCode, packPrice, waLink) {
+  document.getElementById('condModalPackInfo').textContent = 'Pack ' + packCode + ' — ' + packPrice + ' FCFA';
+  document.getElementById('condModalConfirmBtn').href = waLink;
+  document.getElementById('condModalCheckbox').checked = false;
+  document.getElementById('condModalConfirmBtn').classList.remove('active');
+  document.getElementById('condModalOverlay').classList.add('open');
+  return false;
+}
+function netrovaCloseCondModal() {
+  document.getElementById('condModalOverlay').classList.remove('open');
+}
+function netrovaToggleConfirm() {
+  const checked = document.getElementById('condModalCheckbox').checked;
+  document.getElementById('condModalConfirmBtn').classList.toggle('active', checked);
+}
+document.getElementById('condModalOverlay').addEventListener('click', function(e) {
+  if (e.target === this) netrovaCloseCondModal();
+});
+</script>
+
+{% block extra_js %}{% endblock %}
+<script>
+// ── PWA Service Worker ──────────────────────────────────
+if ('serviceWorker' in navigator) {
+  navigator.serviceWorker.register('/static/sw.js').catch(() => {});
+}
+
+// ── Bouton "Installer l'application" ───────────────────
+let deferredPrompt;
+window.addEventListener('beforeinstallprompt', e => {
+  e.preventDefault();
+  deferredPrompt = e;
+  const btn = document.getElementById('btnInstallPWA');
+  if (btn) {
+    btn.style.display = 'flex';
+    btn.addEventListener('click', () => {
+      deferredPrompt.prompt();
+      deferredPrompt.userChoice.then(() => { btn.style.display = 'none'; });
+    });
+  }
+});
+</script>
+</body>
+</html>

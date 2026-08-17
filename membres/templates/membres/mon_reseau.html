@@ -1,0 +1,80 @@
+{% extends 'base.html' %}
+{% block title %}Mon réseau{% endblock %}
+{% block content %}
+<div class="dashboard">
+  <div class="dashboard-header">
+    <h1>👥 Mon réseau</h1>
+    <p>Taux de commission actuel : <strong>{{ membre.taux_commission|floatformat:0 }}%</strong>
+       ({{ membre.nombre_filleuls }} filleul{{ membre.nombre_filleuls|pluralize }} direct{{ membre.nombre_filleuls|pluralize }})</p>
+  </div>
+
+  <!-- Stats de l'équipe -->
+  <div class="team-stats-row">
+    <div class="team-stat-pill">
+      <span style="font-size:24px">👤</span>
+      <div><div class="num">{{ nb_niveau1 }}</div><div class="lbl">Filleuls directs (niveau 1)</div></div>
+    </div>
+    <div class="team-stat-pill">
+      <span style="font-size:24px">👥</span>
+      <div><div class="num">{{ nb_niveau2 }}</div><div class="lbl">Filleuls de filleuls (niveau 2)</div></div>
+    </div>
+    <div class="team-stat-pill">
+      <span style="font-size:24px">🌳</span>
+      <div><div class="num">{{ membre.taille_equipe_totale }}</div><div class="lbl">Équipe totale</div></div>
+    </div>
+  </div>
+
+  <!-- Lien de parrainage -->
+  <div class="card" style="margin-bottom:24px">
+    <div class="card-header"><h3>🔗 Votre lien de parrainage</h3></div>
+    <div class="card-body-pad">
+      <div class="ref-box">
+        <h4>Votre code personnel</h4>
+        <div class="ref-code">{{ membre.code_parrainage }}</div>
+        <div class="ref-link" id="refLink">{{ lien_parrainage }}</div>
+      </div>
+      <button class="btn-copy" onclick="copyRef()">📋 Copier le lien complet</button>
+      <p style="font-size:13px;color:var(--ink-faint);margin-top:12px">
+        💡 Partagez ce lien à vos contacts. Quand ils s'inscrivent et soldent une commande, vous gagnez
+        <strong>{{ membre.taux_commission|floatformat:0 }}%</strong> du montant.
+        Atteignez 10 filleuls pour passer à <strong>3%</strong> !
+      </p>
+    </div>
+  </div>
+
+  <!-- Arbre des filleuls -->
+  <div class="card">
+    <div class="card-header">
+      <h3>🌳 Arbre de mon équipe</h3>
+    </div>
+    <div class="card-body-pad">
+      {% if arbre %}
+        <div class="tree-wrap">
+          {% for noeud in arbre %}
+            {% include "membres/_arbre_noeud.html" with noeud=noeud %}
+          {% endfor %}
+        </div>
+      {% else %}
+      <div class="tree-empty">
+        <div class="empty-icon" style="font-size:40px;margin-bottom:12px">🌳</div>
+        <h4 style="color:var(--ink);font-weight:800">Aucun filleul pour l'instant</h4>
+        <p style="margin-top:6px">Partagez votre lien de parrainage pour commencer à bâtir votre équipe.</p>
+      </div>
+      {% endif %}
+    </div>
+  </div>
+</div>
+
+{% block extra_js %}
+<script>
+function copyRef() {
+  const link = document.getElementById('refLink').textContent.trim();
+  navigator.clipboard.writeText(link).then(() => {
+    const btn = document.querySelector('.btn-copy');
+    btn.textContent = '✅ Copié !';
+    setTimeout(() => btn.textContent = '📋 Copier le lien complet', 2000);
+  });
+}
+</script>
+{% endblock %}
+{% endblock %}

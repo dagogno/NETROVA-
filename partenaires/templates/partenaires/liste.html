@@ -1,0 +1,131 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block title %}Nos Partenaires{% endblock %}
+{% block content %}
+
+<div style="padding-top:70px;background:linear-gradient(160deg,#0A2660,#061337)">
+  <div style="max-width:1240px;margin:0 auto;padding:60px 24px 48px">
+    <span class="section-tag light">Espace Partenaires</span>
+    <h1 style="font-size:clamp(28px,5vw,52px);font-weight:800;color:#fff;margin-top:12px">
+      Nos entreprises partenaires
+    </h1>
+    <p style="color:rgba(255,255,255,0.6);font-size:16px;margin-top:12px;max-width:560px">
+      Découvrez les entreprises et artisans de confiance qui font partie du réseau NETROVA.
+      Des produits et services sélectionnés pour notre communauté.
+    </p>
+    <!-- Filtres catégories -->
+    <div style="display:flex;flex-wrap:wrap;gap:10px;margin-top:28px">
+      <a href="{% url 'partenaires:liste' %}"
+         style="padding:8px 18px;border-radius:100px;font-size:13px;font-weight:700;text-decoration:none;
+                background:{% if not categorie_active %}rgba(255,255,255,0.95){% else %}rgba(255,255,255,0.12){% endif %};
+                color:{% if not categorie_active %}#0A2660{% else %}rgba(255,255,255,0.85){% endif %}">
+        Tous
+      </a>
+      {% for cat in categories %}
+      <a href="{% url 'partenaires:liste' %}?categorie={{ cat.slug }}"
+         style="padding:8px 18px;border-radius:100px;font-size:13px;font-weight:700;text-decoration:none;
+                background:{% if categorie_active.slug == cat.slug %}rgba(255,255,255,0.95){% else %}rgba(255,255,255,0.12){% endif %};
+                color:{% if categorie_active.slug == cat.slug %}#0A2660{% else %}rgba(255,255,255,0.85){% endif %}">
+        {{ cat.emoji }} {{ cat.nom }}
+      </a>
+      {% endfor %}
+    </div>
+  </div>
+</div>
+
+<div style="max-width:1240px;margin:0 auto;padding:48px 24px 80px">
+
+  {% if partenaires %}
+  <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(320px,1fr));gap:24px">
+    {% for p in partenaires %}
+    <a href="{% url 'partenaires:detail' p.pk %}" style="text-decoration:none;color:inherit">
+      <div style="background:var(--paper);border:1.5px solid var(--line);border-radius:var(--r-xl);overflow:hidden;transition:all 0.25s;display:flex;flex-direction:column"
+           onmouseover="this.style.boxShadow='var(--shadow-3)';this.style.transform='translateY(-4px)'"
+           onmouseout="this.style.boxShadow='';this.style.transform=''">
+        <!-- Couverture -->
+        <div style="height:140px;background:linear-gradient(135deg,var(--brand-deep),var(--brand));position:relative;overflow:hidden">
+          {% if p.image_couverture %}
+          <img src="{{ p.image_couverture.url }}" style="width:100%;height:100%;object-fit:cover">
+          {% endif %}
+          {% if p.categorie %}
+          <span style="position:absolute;top:12px;right:12px;background:rgba(255,255,255,0.18);color:#fff;font-size:11px;font-weight:700;padding:4px 12px;border-radius:100px;backdrop-filter:blur(8px)">
+            {{ p.categorie.emoji }} {{ p.categorie.nom }}
+          </span>
+          {% endif %}
+          <!-- Logo -->
+          <div style="position:absolute;bottom:-24px;left:20px;width:52px;height:52px;border-radius:12px;border:3px solid var(--paper);overflow:hidden;background:var(--paper)">
+            {% if p.logo %}
+            <img src="{{ p.logo.url }}" style="width:100%;height:100%;object-fit:cover">
+            {% else %}
+            <div style="width:100%;height:100%;display:flex;align-items:center;justify-content:center;background:var(--cloud);font-size:22px">🏢</div>
+            {% endif %}
+          </div>
+        </div>
+        <!-- Corps -->
+        <div style="padding:32px 20px 20px;flex:1;display:flex;flex-direction:column">
+          <h3 style="font-size:17px;font-weight:800;color:var(--ink)">{{ p.nom }}</h3>
+          {% if p.slogan %}
+          <p style="font-size:13px;color:var(--ink-faint);margin-top:3px;font-style:italic">{{ p.slogan }}</p>
+          {% endif %}
+          <p style="font-size:13.5px;color:var(--ink-soft);margin-top:10px;line-height:1.6;flex:1">
+            {{ p.description|truncatechars:120 }}
+          </p>
+          <div style="display:flex;align-items:center;justify-content:space-between;margin-top:14px;padding-top:14px;border-top:1px solid var(--line)">
+            <span style="font-size:12px;color:var(--ink-faint)">📍 {{ p.zone }}</span>
+            <span style="background:var(--cloud);color:var(--brand);font-size:12px;font-weight:700;padding:4px 12px;border-radius:100px">
+              Voir la vitrine →
+            </span>
+          </div>
+        </div>
+      </div>
+    </a>
+    {% endfor %}
+  </div>
+
+  <!-- CTA devenir partenaire -->
+  <div style="background:linear-gradient(155deg,var(--brand-deep),var(--brand));border-radius:var(--r-xl);padding:48px;text-align:center;margin-top:56px">
+    <h2 style="color:#fff;font-size:26px;font-weight:800">Vous êtes une entreprise ?</h2>
+    <p style="color:rgba(255,255,255,0.65);margin-top:10px;max-width:480px;margin-left:auto;margin-right:auto;font-size:15px">
+      Rejoignez notre réseau de partenaires et présentez vos produits à toute la communauté NETROVA.
+      Visibilité garantie dès votre premier mois.
+    </p>
+    <div style="display:flex;flex-wrap:wrap;gap:14px;justify-content:center;margin-top:28px">
+      {% for plan, label, prix, desc in plans %}
+      <div style="background:rgba(255,255,255,0.10);border:1px solid rgba(255,255,255,0.2);border-radius:var(--r-lg);padding:20px 24px;min-width:180px">
+        <div style="font-weight:800;color:#fff;font-size:14px">{{ label }}</div>
+        <div style="font-size:24px;font-weight:800;color:var(--leaf-soft);margin:6px 0">{{ prix }} <span style="font-size:12px;opacity:0.7">FCFA/mois</span></div>
+        <div style="font-size:12px;color:rgba(255,255,255,0.55)">{{ desc }}</div>
+      </div>
+      {% empty %}
+      <div style="background:rgba(255,255,255,0.10);border:1px solid rgba(255,255,255,0.2);border-radius:var(--r-lg);padding:20px 24px;min-width:180px">
+        <div style="font-weight:800;color:#fff;font-size:14px">Starter</div>
+        <div style="font-size:24px;font-weight:800;color:var(--leaf-soft);margin:6px 0">5 000 <span style="font-size:12px;opacity:0.7">FCFA/mois</span></div>
+        <div style="font-size:12px;color:rgba(255,255,255,0.55)">Profil + 5 produits</div>
+      </div>
+      <div style="background:rgba(255,255,255,0.10);border:1px solid rgba(255,255,255,0.2);border-radius:var(--r-lg);padding:20px 24px;min-width:180px">
+        <div style="font-weight:800;color:#fff;font-size:14px">Standard</div>
+        <div style="font-size:24px;font-weight:800;color:var(--leaf-soft);margin:6px 0">10 000 <span style="font-size:12px;opacity:0.7">FCFA/mois</span></div>
+        <div style="font-size:12px;color:rgba(255,255,255,0.55)">Profil + 15 produits + mise en avant</div>
+      </div>
+      <div style="background:rgba(255,255,255,0.10);border:1px solid rgba(255,255,255,0.2);border-radius:var(--r-lg);padding:20px 24px;min-width:180px">
+        <div style="font-weight:800;color:#fff;font-size:14px">Premium</div>
+        <div style="font-size:24px;font-weight:800;color:var(--leaf-soft);margin:6px 0">20 000 <span style="font-size:12px;opacity:0.7">FCFA/mois</span></div>
+        <div style="font-size:12px;color:rgba(255,255,255,0.55)">Tout illimité + badge prioritaire</div>
+      </div>
+      {% endfor %}
+    </div>
+    <a href="https://wa.me/22890491287?text=Bonjour%20NETROVA%2C%20je%20souhaite%20devenir%20partenaire%20et%20avoir%20une%20vitrine." target="_blank" class="btn-wa-big" style="margin-top:28px;font-size:16px;padding:14px 32px">
+      💬 Devenir partenaire NETROVA
+    </a>
+  </div>
+
+  {% else %}
+  <div class="empty-state" style="padding:80px">
+    <div class="empty-icon">🏢</div>
+    <h4>Aucun partenaire actif pour l'instant</h4>
+    <p>Vous êtes une entreprise ? Rejoignez la première !</p>
+    <a href="https://wa.me/22890491287?text=Bonjour%2C%20je%20souhaite%20devenir%20partenaire%20NETROVA." target="_blank" class="btn-primary">💬 Nous contacter</a>
+  </div>
+  {% endif %}
+</div>
+{% endblock %}

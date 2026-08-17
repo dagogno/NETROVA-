@@ -1,0 +1,184 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block title %}Accueil{% endblock %}
+
+{% block content %}
+
+<!-- ══════════ HERO ══════════ -->
+<section class="hero">
+  <div class="hero-bg"></div>
+  <div class="hero-content fadein">
+    <span class="hero-badge">Réseau communautaire actif au Togo</span>
+    <h1 class="fadein-2">La <em>paix</em>, la <em>confiance</em><br/>et la <em>suffisance</em><br/>dans votre quotidien.</h1>
+    <p class="hero-sub fadein-3">NETROVA connecte les familles et les entrepreneurs autour de packs alimentaires essentiels, d'opportunités de revenus et d'un réseau de confiance durable.</p>
+    <div class="hero-actions fadein-4">
+      <a href="{% url 'produits:catalogue' %}" class="btn-primary">🛒 Voir nos packs</a>
+      <a href="{% url 'membres:inscription' %}" class="btn-outline">Rejoindre gratuitement</a>
+    </div>
+    <!-- Bouton PWA install -->
+    <button id="btnInstallPWA" style="display:none;align-items:center;gap:10px;background:rgba(255,255,255,0.12);border:1.5px solid rgba(255,255,255,0.3);color:#fff;padding:11px 22px;border-radius:100px;cursor:pointer;font-weight:600;font-size:13px;margin-top:20px" class="fadein-4">
+      📱 Installer l'application NETROVA
+    </button>
+    <div class="hero-stats fadein-4">
+      <div class="hero-stat"><div class="stat-num">7<span> packs</span></div><div class="stat-label">Communautaires</div></div>
+      <div class="hero-divider"></div>
+      <div class="hero-stat"><div class="stat-num">2 500 <span>– 30 000</span></div><div class="stat-label">FCFA, adapté à tous</div></div>
+      <div class="hero-divider"></div>
+      <div class="hero-stat"><div class="stat-num">100<span>%</span></div><div class="stat-label">Paiement flexible</div></div>
+    </div>
+  </div>
+</section>
+
+<!-- ══════════ MODES DE PAIEMENT ══════════ -->
+<section style="background:var(--cloud);padding:0">
+  <div style="max-width:1240px;margin:0 auto;padding:48px 24px;display:grid;grid-template-columns:1fr 1fr;gap:20px">
+    <div style="background:var(--paper);border:1px solid var(--line);border-radius:var(--r-xl);padding:28px;display:flex;gap:18px;align-items:flex-start">
+      <span style="font-size:36px;flex-shrink:0">💳</span>
+      <div>
+        <h3 style="font-size:18px;font-weight:800;color:var(--ink)">Paiement à crédit</h3>
+        <p style="color:var(--ink-soft);font-size:14px;margin-top:6px;line-height:1.6">Versez 50% à la commande, recevez votre pack, et réglez le solde dans le délai convenu. Accessible à tous les membres.</p>
+        <a href="{% url 'produits:catalogue' %}" style="display:inline-block;margin-top:14px;color:var(--brand);font-weight:700;font-size:13px">Voir les packs →</a>
+      </div>
+    </div>
+    <div style="background:linear-gradient(145deg,#DFF7E9,#F3FBF6);border:1.5px solid #A8E6C2;border-radius:var(--r-xl);padding:28px;display:flex;gap:18px;align-items:flex-start">
+      <span style="font-size:36px;flex-shrink:0">💵</span>
+      <div>
+        <h3 style="font-size:18px;font-weight:800;color:var(--leaf-deep)">Paiement comptant</h3>
+        <p style="color:#176B3B;font-size:14px;margin-top:6px;line-height:1.6">Payez tout d'un coup et bénéficiez d'une <strong>réduction de 2%</strong> + <strong>livraison gratuite</strong> sur votre 1ère commande.</p>
+        <a href="{% url 'produits:catalogue' %}" style="display:inline-block;margin-top:14px;color:var(--leaf-deep);font-weight:700;font-size:13px">Commander comptant →</a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ══════════ VALEURS ══════════ -->
+<section id="valeurs" class="section">
+  <div class="section-header center">
+    <span class="section-tag">Qui sommes-nous</span>
+    <h2 class="section-title">NETROVA, c'est 6 piliers<br/><em>pour votre quotidien</em></h2>
+    <p class="section-sub">Chaque lettre de NETROVA porte une valeur fondatrice.</p>
+  </div>
+  <div class="values-grid">
+    <div class="value-card"><div class="value-icon v1">🌐</div><h3>N – Réseau</h3><p>Nous connectons les personnes autour d'objectifs communs.</p></div>
+    <div class="value-card"><div class="value-icon v2">🔄</div><h3>E – Échange</h3><p>Des opportunités partagées pour grandir ensemble.</p></div>
+    <div class="value-card"><div class="value-icon v3">🚀</div><h3>T – Transformation</h3><p>Changer les vies par l'action collective et la confiance.</p></div>
+    <div class="value-card"><div class="value-icon v4">💼</div><h3>R – Revenus</h3><p>Créer des sources de revenus durables pour tous les membres.</p></div>
+    <div class="value-card"><div class="value-icon v1">💡</div><h3>O – Opportunités</h3><p>Travail, revenus et évolution accessibles pour chacun.</p></div>
+    <div class="value-card"><div class="value-icon v5">❤️</div><h3>V·A – Vision & Alliance</h3><p>Une vision commune portée par une alliance de confiance.</p></div>
+  </div>
+</section>
+
+<!-- ══════════ PACKS ══════════ -->
+<section class="section-bg">
+  <div>
+    <div class="section-header center">
+      <span class="section-tag">7 Packs communautaires</span>
+      <h2 class="section-title">Pour tous les besoins,<br/><em>pour toutes les familles</em></h2>
+    </div>
+    <div class="packs-grid">
+      {% for pack in packs %}
+      <div class="pack-card {% if pack.code == '3A' %}featured{% endif %}">
+        <div class="pack-header pack-{{ pack.code|lower }}">
+          <div class="pack-label">Pack {{ pack.code }}{% if pack.code == '3A' %} ⭐{% endif %}</div>
+          <div class="pack-price">{{ pack.prix_formate }} <span>FCFA</span></div>
+          {% if pack.note_quantite %}<div class="pack-badge">{{ pack.note_quantite }}</div>{% endif %}
+        </div>
+        <div class="pack-body">
+          <ul class="pack-items">
+            {% for comp in pack.composants_liste %}
+            <li>{% if comp.emoji %}{{ comp.emoji }}{% endif %} {{ comp.nom }}</li>
+            {% endfor %}
+          </ul>
+          <div class="pack-actions">
+            <a href="#" class="btn-whatsapp" onclick="return netrovaOpenCondModal('{{ pack.code }}', '{{ pack.prix_formate }}', '{{ pack.lien_whatsapp }}')">💬 Crédit</a>
+            <a href="{% url 'produits:detail' pack.code %}" class="btn-detail">Détails</a>
+          </div>
+        </div>
+      </div>
+      {% endfor %}
+    </div>
+    <div class="center" style="margin-top:36px;padding-bottom:80px">
+      <a href="{% url 'produits:catalogue' %}" class="btn-primary">Voir tous les packs →</a>
+    </div>
+  </div>
+</section>
+
+<!-- ══════════ PARTENAIRES ══════════ -->
+{% if partenaires %}
+<section class="section">
+  <div class="section-header">
+    <span class="section-tag">Nos partenaires</span>
+    <h2 class="section-title">Entreprises de confiance<br/><em>dans notre réseau</em></h2>
+    <p class="section-sub">Des entreprises vérifiées par NETROVA, prêtes à vous servir.</p>
+  </div>
+  <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:18px">
+    {% for p in partenaires %}
+    <a href="{% url 'partenaires:detail' p.pk %}" style="text-decoration:none;color:inherit">
+      <div style="background:var(--paper);border:1px solid var(--line);border-radius:var(--r-lg);padding:20px;display:flex;gap:14px;align-items:center;transition:all 0.2s"
+           onmouseover="this.style.boxShadow='var(--shadow-2)';this.style.transform='translateY(-3px)'"
+           onmouseout="this.style.boxShadow='';this.style.transform=''">
+        <div style="width:48px;height:48px;border-radius:10px;overflow:hidden;flex-shrink:0;background:var(--cloud)">
+          {% if p.logo %}<img src="{{ p.logo.url }}" style="width:100%;height:100%;object-fit:cover">
+          {% else %}<div style="width:100%;height:100%;display:flex;align-items:center;justify-content:center;font-size:22px">🏢</div>{% endif %}
+        </div>
+        <div>
+          <div style="font-weight:800;font-size:14px;color:var(--ink)">{{ p.nom }}</div>
+          {% if p.categorie %}<div style="font-size:12px;color:var(--ink-faint);margin-top:2px">{{ p.categorie.emoji }} {{ p.categorie.nom }}</div>{% endif %}
+          <div style="font-size:12px;color:var(--brand);font-weight:600;margin-top:4px">Voir la vitrine →</div>
+        </div>
+      </div>
+    </a>
+    {% endfor %}
+  </div>
+  <div style="margin-top:28px">
+    <a href="{% url 'partenaires:liste' %}" class="btn-outline btn-sm">Voir tous les partenaires</a>
+    <a href="https://wa.me/22890491287?text=Bonjour%20NETROVA%2C%20je%20souhaite%20devenir%20partenaire." target="_blank" class="btn-primary btn-sm" style="margin-left:12px">🏢 Devenir partenaire</a>
+  </div>
+</section>
+{% endif %}
+
+<!-- ══════════ POURQUOI ══════════ -->
+<section class="section" style="background:var(--cloud);max-width:100%;padding-left:0;padding-right:0">
+  <div style="max-width:1240px;margin:0 auto;padding:80px 24px">
+    <div class="why-grid">
+      <div>
+        <span class="section-tag">Pourquoi NETROVA ?</span>
+        <h2 class="section-title">Plus qu'un réseau,<br/><em>une famille</em></h2>
+        <div class="why-list">
+          <div class="why-item"><div class="why-icon">🏆</div><div><h4>Produits essentiels de qualité</h4><p>Marques reconnues dans chaque pack, compositions soigneusement choisies.</p></div></div>
+          <div class="why-item"><div class="why-icon">💵</div><div><h4>Comptant ou à crédit</h4><p>Payez tout d'un coup (remise 2%) ou par acompte selon votre situation.</p></div></div>
+          <div class="why-item"><div class="why-icon">🛵</div><div><h4>Livraison disponible</h4><p>Zone couverte : Baguida – Lomé et environs, chaque samedi après-midi.</p></div></div>
+          <div class="why-item"><div class="why-icon">📈</div><div><h4>Opportunités de revenus</h4><p>Parrainez vos proches et gagnez 2 à 3% de commission sur leurs commandes.</p></div></div>
+        </div>
+      </div>
+      <div class="why-visual">
+        <div class="why-visual-inner">
+          <p class="why-quote">"NETROVA, plus qu'un réseau, une famille !"</p>
+          <span>— La vision qui guide chaque action</span>
+          <div class="why-tags">
+            <span>🤝 Confiance</span><span>🌱 Croissance</span>
+            <span>🏠 Famille</span><span>💚 Solidarité</span><span>🌍 Togo</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ══════════ CONTACT ══════════ -->
+<section class="contact-section">
+  <div class="contact-inner">
+    <span class="section-tag light">Nous rejoindre</span>
+    <h2 class="section-title light center" style="margin:0 auto">Rejoignez-nous et<br/>changez votre quotidien</h2>
+    <div class="contact-cards">
+      <div class="contact-card"><div class="cc-icon">📞</div><h4>Appel & WhatsApp</h4><p>+228 90 49 12 87</p></div>
+      <div class="contact-card"><div class="cc-icon">📍</div><h4>Zone couverte</h4><p>Baguida – Lomé et environs</p></div>
+      <div class="contact-card"><div class="cc-icon">📅</div><h4>Livraisons</h4><p>Chaque samedi après-midi</p></div>
+    </div>
+    <a href="https://wa.me/22890491287?text=Bonjour%20NETROVA%2C%20je%20souhaite%20rejoindre%20le%20r%C3%A9seau." target="_blank" class="btn-wa-big">
+      💬 Nous contacter sur WhatsApp
+    </a>
+  </div>
+</section>
+
+{% endblock %}

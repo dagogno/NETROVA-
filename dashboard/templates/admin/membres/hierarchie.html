@@ -1,0 +1,21 @@
+{% extends "admin/base_site.html" %}
+{% load static %}
+
+{% block content %}
+<div class="nr-tree-page">
+  <div class="nr-dash-header">
+    <h1>🌳 Hiérarchie complète du réseau</h1>
+    <p>{{ total_membres }} membre{{ total_membres|pluralize }} au total — organisés par parrainage (parrain → filleuls)</p>
+  </div>
+
+  {% if arbre %}
+    {% for noeud in arbre %}
+      {% include "admin/membres/_arbre_noeud.html" with noeud=noeud %}
+    {% endfor %}
+  {% else %}
+    <p class="nr-empty">Aucun membre racine pour l'instant.</p>
+  {% endif %}
+</div>
+{% endblock %}
+
+{% block sidebar %}{% endblock %}

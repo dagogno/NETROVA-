@@ -1,0 +1,137 @@
+{% extends 'base.html' %}
+{% block title %}CMD-{{ commande.pk|stringformat:"04d" }}{% endblock %}
+{% block content %}
+<div class="dashboard">
+  <a href="{% url 'commandes:mes_commandes' %}" style="color:var(--ink-faint);text-decoration:none;font-size:14px;font-weight:600">← Retour à mes commandes</a>
+
+  <div style="margin-top:22px;display:grid;grid-template-columns:1fr 1fr;gap:22px">
+
+    <!-- Détails commande -->
+    <div class="card">
+      <div class="card-header">
+        <h3>Commande CMD-{{ commande.pk|stringformat:"04d" }}</h3>
+        {% if commande.statut == 'soldee' %}<span class="badge badge-green">✅ Soldée</span>
+        {% elif commande.statut == 'acompte_paye' %}<span class="badge badge-yellow">⏳ Acompte payé</span>
+        {% elif commande.statut == 'en_retard' %}<span class="badge badge-red">⚠️ En retard</span>
+        {% elif commande.statut == 'annulee' %}<span class="badge badge-gray">❌ Annulée</span>
+        {% else %}<span class="badge badge-blue">🔵 En attente</span>{% endif %}
+      </div>
+      <div class="card-body-pad">
+        <table style="width:100%">
+          <tr>
+            <td style="color:var(--ink-faint);font-size:13px;padding:7px 0">Pack</td>
+            <td style="font-weight:700">Pack {{ commande.pack.code }} — {{ commande.pack.prix_formate }} FCFA</td>
+          </tr>
+          <tr>
+            <td style="color:var(--ink-faint);font-size:13px;padding:7px 0">Quantité</td>
+            <td>{{ commande.quantite }}</td>
+          </tr>
+          <tr>
+            <td style="color:var(--ink-faint);font-size:13px;padding:7px 0">Montant total</td>
+            <td style="font-weight:800;font-size:16px">{{ commande.montant_total }} FCFA</td>
+          </tr>
+          <tr>
+            <td style="color:var(--ink-faint);font-size:13px;padding:7px 0">Acompte requis (50%)</td>
+            <td>{{ commande.acompte_requis }} FCFA</td>
+          </tr>
+          <tr>
+            <td style="color:var(--ink-faint);font-size:13px;padding:7px 0">Montant versé</td>
+            <td style="color:var(--leaf-deep);font-weight:700">{{ commande.montant_verse }} FCFA</td>
+          </tr>
+          <tr>
+            <td style="color:var(--ink-faint);font-size:13px;padding:7px 0">Solde restant</td>
+            <td style="color:{% if commande.solde_restant > 0 %}var(--coral){% else %}var(--leaf-deep){% endif %};font-weight:800;font-size:16px">
+              {{ commande.solde_restant }} FCFA
+            </td>
+          </tr>
+          {% if commande.penalite_totale > 0 %}
+          <tr>
+            <td style="color:var(--coral);font-size:13px;padding:7px 0">⚠️ Pénalités</td>
+            <td style="color:var(--coral);font-weight:700">{{ commande.penalite_totale }} FCFA ({{ commande.jours_retard }} jours)</td>
+          </tr>
+          {% endif %}
+          <tr>
+            <td style="color:var(--ink-faint);font-size:13px;padding:7px 0">Date commande</td>
+            <td>{{ commande.date_commande|date:"d/m/Y" }}</td>
+          </tr>
+          <tr>
+            <td style="color:var(--ink-faint);font-size:13px;padding:7px 0">Date limite solde</td>
+            <td style="{% if commande.est_en_retard %}color:var(--coral);font-weight:700{% endif %}">
+              {{ commande.date_limite_solde|date:"d/m/Y" }}
+              {% if commande.est_en_retard %} ⚠️{% endif %}
+            </td>
+          </tr>
+        </table>
+
+        {% if commande.solde_restant > 0 and commande.statut != 'annulee' %}
+        <a href="https://wa.me/22890491287?text=Bonjour%20NETROVA%2C%20je%20souhaite%20r%C3%A9gler%20le%20solde%20de%20ma%20commande%20CMD-{{ commande.pk|stringformat:'04d' }}%20({{ commande.solde_restant }}%20FCFA)."
+           target="_blank" class="btn-wa-big" style="font-size:14px;padding:12px 22px;margin-top:20px">
+          💬 Payer le solde via WhatsApp
+        </a>
+        {% endif %}
+      </div>
+    </div>
+
+    <!-- Historique paiements -->
+    <div class="card">
+      <div class="card-header"><h3>💰 Historique des paiements</h3></div>
+      <div class="card-body">
+        {% if commande.paiements.all %}
+        <table>
+          <thead><tr><th>Date</th><th>Montant</th><th>Mode</th></tr></thead>
+          <tbody>
+          {% for p in commande.paiements.all %}
+          <tr>
+            <td style="color:var(--ink-faint);font-size:13px">{{ p.date_paiement|date:"d/m/Y" }}</td>
+            <td style="font-weight:700;color:var(--leaf-deep)">{{ p.montant }} F</td>
+            <td><span class="badge badge-blue">{{ p.get_mode_paiement_display }}</span></td>
+          </tr>
+          {% endfor %}
+          </tbody>
+        </table>
+        {% else %}
+        <div class="empty-state" style="padding:40px">
+          <p>Aucun paiement enregistré pour le moment.</p>
+          <p style="font-size:13px;color:var(--ink-faint);margin-top:8px">
+            Contactez-nous sur WhatsApp pour effectuer votre acompte.
+          </p>
+        </div>
+        {% endif %}
+      </div>
+
+      <!-- Barre de progression du paiement -->
+      {% if commande.montant_total > 0 %}
+      <div class="card-body-pad" style="border-top:1px solid var(--line)">
+        <div style="font-size:12px;font-weight:700;color:var(--ink-faint);text-transform:uppercase;letter-spacing:0.5px;margin-bottom:8px">
+          Progression du paiement
+        </div>
+        {% widthratio commande.montant_verse commande.montant_total 100 as pct %}
+        <div style="background:var(--cloud);border-radius:100px;height:10px;overflow:hidden">
+          <div style="width:{{ pct }}%;background:var(--leaf);height:100%;border-radius:100px;transition:width 0.6s ease"></div>
+        </div>
+        <div style="display:flex;justify-content:space-between;margin-top:6px;font-size:12px;color:var(--ink-faint)">
+          <span>{{ commande.montant_verse }} F versés</span>
+          <span>{{ pct }}%</span>
+          <span>Total : {{ commande.montant_total }} F</span>
+        </div>
+      </div>
+      {% endif %}
+    </div>
+
+  </div>
+
+  <!-- Pack détails -->
+  <div class="card" style="margin-top:22px">
+    <div class="card-header"><h3>📦 Contenu du pack {{ commande.pack.code }}</h3></div>
+    <div class="card-body-pad">
+      <div style="display:flex;flex-wrap:wrap;gap:8px">
+        {% for comp in commande.pack.composants_liste %}
+        <span style="background:var(--cloud);border:1px solid var(--line);border-radius:100px;padding:5px 14px;font-size:13px;font-weight:600;color:var(--ink-soft)">
+          {% if comp.emoji %}{{ comp.emoji }}{% endif %} {{ comp.nom }}
+        </span>
+        {% endfor %}
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

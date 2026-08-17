@@ -1,0 +1,20 @@
+{% extends "admin/base.html" %}
+{% load static %}
+
+{% block title %}{{ title }} | NETROVA Admin{% endblock %}
+
+{% block extrastyle %}
+{{ block.super }}
+<link rel="stylesheet" href="{% static 'admin_custom/css/netrova_admin.css' %}">
+{% endblock %}
+
+{% block branding %}
+<div id="site-name" class="netrova-branding">
+  <a href="{% url 'admin:index' %}">
+    <span class="netrova-logo-mark">N</span>
+    <span class="netrova-logo-text">NETROVA <small>Admin</small></span>
+  </a>
+</div>
+{% endblock %}
+
+{% block nav-global %}{% endblock %}

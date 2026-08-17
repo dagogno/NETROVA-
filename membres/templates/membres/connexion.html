@@ -1,0 +1,33 @@
+{% extends 'base.html' %}
+{% block title %}Connexion{% endblock %}
+{% block content %}
+<div class="form-page">
+  <div class="form-card">
+    <h1>Se connecter</h1>
+    <p class="form-subtitle">Accédez à votre espace membre NETROVA.</p>
+
+    <form method="post" novalidate>
+      {% csrf_token %}
+      <div class="form-group">
+        <label>Nom d'utilisateur</label>
+        <input type="text" name="username" autofocus placeholder="Votre nom d'utilisateur" required>
+      </div>
+      <div class="form-group">
+        <label>Mot de passe</label>
+        <input type="password" name="password" placeholder="Votre mot de passe" required>
+      </div>
+
+      {% if form.errors %}
+      <div style="background:#FDE6E4;color:#8E1F18;padding:12px 16px;border-radius:var(--r-sm);margin-bottom:16px;font-size:14px;border:1px solid #F4B6B0">
+        ⚠️ Identifiants incorrects. Veuillez réessayer.
+      </div>
+      {% endif %}
+
+      <div class="form-submit">
+        <button type="submit" class="btn-primary" style="width:100%">Se connecter →</button>
+      </div>
+      <p class="form-footer">Pas encore membre ? <a href="{% url 'membres:inscription' %}">Créer un compte gratuitement</a></p>
+    </form>
+  </div>
+</div>
+{% endblock %}
