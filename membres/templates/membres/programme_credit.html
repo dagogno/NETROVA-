@@ -1,0 +1,111 @@
+{% extends 'base.html' %}
+{% block title %}Programme crédit{% endblock %}
+{% block content %}
+<div class="form-page">
+  <div class="form-card" style="max-width:640px">
+    <h1>💳 Programme crédit</h1>
+    <p class="form-subtitle">Payez vos packs en plusieurs fois : 50% à la commande, le solde plus tard.</p>
+
+    <div style="background:var(--cloud);border:1px solid var(--line);border-radius:var(--r-md);padding:16px 20px;margin:18px 0;font-size:13.5px;color:var(--ink-soft);line-height:1.7">
+      <strong style="color:var(--ink)">Comment ça marche :</strong>
+      <ul style="margin-top:8px;display:flex;flex-direction:column;gap:5px;padding-left:18px;list-style:disc">
+        <li>Vous versez un acompte de 50% à la commande</li>
+        <li>NETROVA livre votre pack</li>
+        <li>Le solde est réglé dans le délai indiqué lors de la commande</li>
+        <li>Des pénalités de retard peuvent s'appliquer en cas de retard de paiement</li>
+      </ul>
+      <p style="margin-top:10px">
+        Pour évaluer votre fiabilité, une vérification d'identité (KYC) est demandée. Vos documents restent confidentiels et sont vérifiés manuellement par l'équipe NETROVA.
+      </p>
+    </div>
+
+    {% if membre.kyc_statut == 'valide' %}
+      <div style="text-align:center;padding:24px 0">
+        <span class="kyc-badge kyc-valide" style="font-size:14px;padding:10px 20px">✅ Programme crédit actif</span>
+        <p style="color:var(--ink-faint);font-size:13.5px;margin-top:14px">
+          Votre identité est vérifiée. Vous pouvez commander vos packs à crédit sur le catalogue.
+        </p>
+        <a href="{% url 'produits:catalogue' %}" class="btn-primary btn-sm" style="margin-top:8px;display:inline-block">Voir les packs</a>
+      </div>
+
+    {% elif membre.kyc_statut == 'en_attente' %}
+      <div style="text-align:center;padding:24px 0">
+        <span class="kyc-badge kyc-attente" style="font-size:14px;padding:10px 20px">⏳ En cours de vérification</span>
+        <p style="color:var(--ink-faint);font-size:13.5px;margin-top:14px">
+          Votre dossier a bien été reçu. L'équipe NETROVA vérifie vos documents et vous notifiera dès que possible.
+        </p>
+      </div>
+
+    {% else %}
+      {% if membre.kyc_statut == 'rejete' %}
+      <div style="background:#FDE6E4;border:1px solid #F4B6B0;border-radius:var(--r-md);padding:14px 18px;margin-bottom:16px;font-size:13.5px;color:#8E1F18">
+        <strong>❌ Votre précédente demande a été rejetée.</strong>
+        {% if membre.kyc_note %}<p style="margin-top:4px">{{ membre.kyc_note }}</p>{% endif %}
+        <p style="margin-top:4px">Vous pouvez renvoyer vos documents ci-dessous.</p>
+      </div>
+      {% endif %}
+
+      <form method="post" enctype="multipart/form-data" novalidate>
+        {% csrf_token %}
+        {% if form.non_field_errors %}
+        <div style="background:#FDE6E4;color:#8E1F18;padding:12px;border-radius:10px;margin-bottom:16px;font-size:14px;">
+          {% for err in form.non_field_errors %}{{ err }}{% endfor %}
+        </div>
+        {% endif %}
+
+        <div class="form-section-title">🪪 Vérification d'identité</div>
+        <div class="form-row">
+          <div class="form-group">
+            <label>Photo de profil * (selfie)</label>
+            <label class="upload-box">
+              <input type="file" name="photo_profil" accept="image/*" required>
+              <div class="upload-box-icon">🤳</div>
+              <div class="upload-box-text">Cliquez pour choisir une photo</div>
+              <div class="upload-box-sub">JPG, PNG — visage bien visible</div>
+            </label>
+            {% if form.photo_profil.errors %}<span class="error">{{ form.photo_profil.errors.0 }}</span>{% endif %}
+          </div>
+          <div class="form-group">
+            <label>CNI / Passeport — Recto *</label>
+            <label class="upload-box">
+              <input type="file" name="carte_identite_recto" accept="image/*" required>
+              <div class="upload-box-icon">🪪</div>
+              <div class="upload-box-text">Cliquez pour choisir un fichier</div>
+              <div class="upload-box-sub">Pièce d'identité en cours de validité</div>
+            </label>
+            {% if form.carte_identite_recto.errors %}<span class="error">{{ form.carte_identite_recto.errors.0 }}</span>{% endif %}
+          </div>
+        </div>
+        <div class="form-group">
+          <label>CNI — Verso (optionnel)</label>
+          <label class="upload-box">
+            <input type="file" name="carte_identite_verso" accept="image/*">
+            <div class="upload-box-icon">📄</div>
+            <div class="upload-box-text">Cliquez pour choisir un fichier</div>
+            <div class="upload-box-sub">Facultatif mais recommandé</div>
+          </label>
+        </div>
+
+        <div class="form-submit">
+          <button type="submit" class="btn-primary btn-green">Envoyer ma demande →</button>
+        </div>
+      </form>
+    {% endif %}
+  </div>
+</div>
+
+{% block extra_js %}
+<script>
+document.querySelectorAll('.upload-box input[type=file]').forEach(function(input) {
+  input.addEventListener('change', function() {
+    const box = input.closest('.upload-box');
+    const textEl = box.querySelector('.upload-box-text');
+    if (input.files && input.files[0]) {
+      textEl.textContent = '✅ ' + input.files[0].name;
+      box.style.borderColor = 'var(--leaf)';
+    }
+  });
+});
+</script>
+{% endblock %}
+{% endblock %}

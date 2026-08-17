@@ -1,0 +1,7 @@
+Django>=4.2,<5.0
+djangorestframework>=3.15,<3.16   # API JSON pour l'app mobile (React Native)
+python-decouple>=3.8
+whitenoise>=6.6
+Pillow>=10.0
+psycopg2-binary>=2.9   # pour PostgreSQL en production
+gunicorn>=21.0          # serveur WSGI pour la production

@@ -1,0 +1,102 @@
+{% extends 'base.html' %}
+{% block title %}Mon profil{% endblock %}
+{% block content %}
+<div class="dashboard">
+  <div class="profile-header">
+    <div class="profile-avatar">
+      {% if membre.photo_profil %}<img src="{{ membre.photo_profil.url }}" alt="Photo">{% else %}👤{% endif %}
+    </div>
+    <div class="profile-info">
+      <h2>{{ membre.nom_complet }}</h2>
+      <p>{{ membre.user.email }} · {{ membre.telephone }}</p>
+      <div class="profile-code">Code : {{ membre.code_parrainage }}</div>
+    </div>
+    <div class="score-widget" style="margin-left:auto">
+      <div class="score-ring" style="width:64px;height:64px">
+        <svg viewBox="0 0 86 86" style="width:64px;height:64px">
+          <circle class="score-ring-bg" cx="43" cy="43" r="39"/>
+          <circle class="score-ring-fill" cx="43" cy="43" r="39"
+                  stroke-dasharray="{{ score_circumference }}"
+                  stroke-dashoffset="{{ score_offset }}"/>
+        </svg>
+        <div class="score-ring-text">
+          <div class="score-ring-num" style="font-size:16px">{{ membre.score_confiance }}</div>
+        </div>
+      </div>
+      <div class="score-label-text">
+        <strong style="font-size:13px">{{ score_label }}</strong>
+        <span style="font-size:11px">Score de confiance</span>
+      </div>
+    </div>
+  </div>
+
+  <div style="margin-bottom:20px;display:flex;align-items:center;gap:12px;flex-wrap:wrap">
+    {% if membre.kyc_statut == 'valide' %}
+      <span class="kyc-badge kyc-valide">✅ Programme crédit actif</span>
+    {% elif membre.kyc_statut == 'en_attente' %}
+      <span class="kyc-badge kyc-attente">⏳ Programme crédit — en cours de vérification</span>
+    {% elif membre.kyc_statut == 'rejete' %}
+      <span class="kyc-badge kyc-rejete">❌ Programme crédit — dossier rejeté</span>
+      {% if membre.kyc_note %}<span style="font-size:13px;color:var(--ink-faint)">{{ membre.kyc_note }}</span>{% endif %}
+      <a href="{% url 'membres:programme_credit' %}" class="btn-outline btn-sm">Renvoyer mes documents</a>
+    {% else %}
+      <span class="kyc-badge" style="background:#EEF1F8;color:#5A6A8F">🔵 Programme crédit non demandé</span>
+      <a href="{% url 'membres:programme_credit' %}" class="btn-outline btn-sm">💳 Participer au programme crédit</a>
+    {% endif %}
+  </div>
+
+  <div class="card" style="max-width:640px">
+    <div class="card-header"><h3>✏️ Modifier mon profil</h3></div>
+    <div class="card-body-pad">
+      <form method="post" novalidate>
+        {% csrf_token %}
+
+        <div class="form-section-title">👤 Informations personnelles</div>
+        <div class="form-row">
+          <div class="form-group">
+            <label>Prénom</label>
+            <input type="text" name="prenom" value="{{ forme.prenom.value|default:'' }}">
+            {% if forme.prenom.errors %}<span class="error">{{ forme.prenom.errors.0 }}</span>{% endif %}
+          </div>
+          <div class="form-group">
+            <label>Nom</label>
+            <input type="text" name="nom" value="{{ forme.nom.value|default:'' }}">
+            {% if forme.nom.errors %}<span class="error">{{ forme.nom.errors.0 }}</span>{% endif %}
+          </div>
+        </div>
+        <div class="form-group">
+          <label>Email</label>
+          <input type="email" name="email" value="{{ forme.email.value|default:'' }}">
+          {% if forme.email.errors %}<span class="error">{{ forme.email.errors.0 }}</span>{% endif %}
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label>Téléphone</label>
+            <input type="tel" name="telephone" value="{{ forme.telephone.value|default:'' }}">
+          </div>
+          <div class="form-group">
+            <label>Zone / Quartier</label>
+            <input type="text" name="zone" value="{{ forme.zone.value|default:'' }}">
+          </div>
+        </div>
+        <div class="form-group">
+          <label>Adresse</label>
+          <input type="text" name="adresse" value="{{ forme.adresse.value|default:'' }}">
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label>Personne de confiance (nom)</label>
+            <input type="text" name="personne_confiance_nom" value="{{ forme.personne_confiance_nom.value|default:'' }}">
+          </div>
+          <div class="form-group">
+            <label>Personne de confiance (tél.)</label>
+            <input type="tel" name="personne_confiance_tel" value="{{ forme.personne_confiance_tel.value|default:'' }}">
+          </div>
+        </div>
+
+        <button type="submit" class="btn-primary" style="margin-top:10px">Sauvegarder les modifications</button>
+      </form>
+    </div>
+  </div>
+</div>
+{% endblock %}
