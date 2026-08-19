@@ -1,0 +1,129 @@
+{% extends 'base.html' %}
+{% block title %}Mon profil{% endblock %}
+{% block content %}
+<div class="dashboard">
+  <div class="profile-header">
+    <div class="profile-avatar">
+      {% if membre.photo_profil %}<img src="{{ membre.photo_profil.url }}" alt="Photo">{% else %}👤{% endif %}
+    </div>
+    <div class="profile-info">
+      <h2>{{ membre.nom_complet }}</h2>
+      <p>{{ membre.user.email }} · {{ membre.telephone }}</p>
+      <div class="profile-code">Code : {{ membre.code_parrainage }}</div>
+    </div>
+    <div class="score-widget" style="margin-left:auto">
+      <div class="score-ring" style="width:64px;height:64px">
+        <svg viewBox="0 0 86 86" style="width:64px;height:64px">
+          <circle class="score-ring-bg" cx="43" cy="43" r="39"/>
+          <circle class="score-ring-fill" cx="43" cy="43" r="39"
+                  stroke-dasharray="{{ score_circumference }}"
+                  stroke-dashoffset="{{ score_offset }}"/>
+        </svg>
+        <div class="score-ring-text">
+          <div class="score-ring-num" style="font-size:16px">{{ membre.score_confiance }}</div>
+        </div>
+      </div>
+      <div class="score-label-text">
+        <strong style="font-size:13px">{{ score_label }}</strong>
+        <span style="font-size:11px">Score de confiance</span>
+      </div>
+    </div>
+  </div>
+
+  <div style="margin-bottom:20px">
+    {% if membre.kyc_statut == 'valide' %}
+      <span class="kyc-badge kyc-valide">✅ Identité vérifiée</span>
+    {% elif membre.kyc_statut == 'rejete' %}
+      <span class="kyc-badge kyc-rejete">❌ KYC rejeté</span>
+      {% if membre.kyc_note %}<span style="font-size:13px;color:var(--ink-faint);margin-left:8px">{{ membre.kyc_note }}</span>{% endif %}
+    {% else %}
+      <span class="kyc-badge kyc-attente">⏳ Identité en cours de vérification</span>
+    {% endif %}
+  </div>
+
+  <div class="card" style="max-width:640px">
+    <div class="card-header"><h3>✏️ Modifier mon profil</h3></div>
+    <div class="card-body-pad">
+      <form method="post" enctype="multipart/form-data" novalidate>
+        {% csrf_token %}
+
+        <div class="form-section-title">👤 Informations personnelles</div>
+        <div class="form-row">
+          <div class="form-group">
+            <label>Prénom</label>
+            <input type="text" name="prenom" value="{{ forme.prenom.value|default:'' }}">
+            {% if forme.prenom.errors %}<span class="error">{{ forme.prenom.errors.0 }}</span>{% endif %}
+          </div>
+          <div class="form-group">
+            <label>Nom</label>
+            <input type="text" name="nom" value="{{ forme.nom.value|default:'' }}">
+            {% if forme.nom.errors %}<span class="error">{{ forme.nom.errors.0 }}</span>{% endif %}
+          </div>
+        </div>
+        <div class="form-group">
+          <label>Email</label>
+          <input type="email" name="email" value="{{ forme.email.value|default:'' }}">
+          {% if forme.email.errors %}<span class="error">{{ forme.email.errors.0 }}</span>{% endif %}
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label>Téléphone</label>
+            <input type="tel" name="telephone" value="{{ forme.telephone.value|default:'' }}">
+          </div>
+          <div class="form-group">
+            <label>Zone / Quartier</label>
+            <input type="text" name="zone" value="{{ forme.zone.value|default:'' }}">
+          </div>
+        </div>
+        <div class="form-group">
+          <label>Adresse</label>
+          <input type="text" name="adresse" value="{{ forme.adresse.value|default:'' }}">
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label>Personne de confiance (nom)</label>
+            <input type="text" name="personne_confiance_nom" value="{{ forme.personne_confiance_nom.value|default:'' }}">
+          </div>
+          <div class="form-group">
+            <label>Personne de confiance (tél.)</label>
+            <input type="tel" name="personne_confiance_tel" value="{{ forme.personne_confiance_tel.value|default:'' }}">
+          </div>
+        </div>
+
+        <div class="form-section-title">🪪 Documents d'identité (KYC)</div>
+        <p style="font-size:12px;color:var(--ink-faint);margin-bottom:12px;margin-top:-6px">
+          Modifier un document relance automatiquement sa vérification par l'équipe NETROVA.
+        </p>
+        <div class="form-row">
+          <div class="form-group">
+            <label>Photo de profil</label>
+            <label class="upload-box">
+              <input type="file" name="photo_profil" accept="image/*">
+              <div class="upload-box-icon">🤳</div>
+              <div class="upload-box-text">{% if membre.photo_profil %}Changer la photo{% else %}Ajouter une photo{% endif %}</div>
+            </label>
+          </div>
+          <div class="form-group">
+            <label>CNI Recto</label>
+            <label class="upload-box">
+              <input type="file" name="carte_identite_recto" accept="image/*">
+              <div class="upload-box-icon">🪪</div>
+              <div class="upload-box-text">{% if membre.carte_identite_recto %}Changer le document{% else %}Ajouter un document{% endif %}</div>
+            </label>
+          </div>
+        </div>
+        <div class="form-group">
+          <label>CNI Verso (optionnel)</label>
+          <label class="upload-box">
+            <input type="file" name="carte_identite_verso" accept="image/*">
+            <div class="upload-box-icon">📄</div>
+            <div class="upload-box-text">{% if membre.carte_identite_verso %}Changer le document{% else %}Ajouter un document{% endif %}</div>
+          </label>
+        </div>
+
+        <button type="submit" class="btn-primary" style="margin-top:10px">Sauvegarder les modifications</button>
+      </form>
+    </div>
+  </div>
+</div>
+{% endblock %}

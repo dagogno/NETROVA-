@@ -1,0 +1,217 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block title %}Tableau de bord{% endblock %}
+{% block content %}
+<div class="dashboard">
+
+  <!-- ══ Alerte KYC ══════════════════════════════════════════════════════════ -->
+  {% if alerte_kyc %}
+  <div style="background:linear-gradient(145deg,#FCF0D6,#FEF7E6);border:1.5px solid #F2D58E;border-radius:var(--r-lg);padding:18px 24px;margin-bottom:24px;display:flex;align-items:center;gap:16px;flex-wrap:wrap">
+    <span style="font-size:30px">🪪</span>
+    <div style="flex:1;min-width:200px">
+      <strong style="color:#7A5300;font-size:15px">Vérification d'identité requise</strong>
+      <p style="color:#7A5300;font-size:13px;margin-top:4px">
+        Vous avez effectué {{ nb_commandes_soldees }} commande{{ nb_commandes_soldees|pluralize }} soldée{{ nb_commandes_soldees|pluralize }}.
+        Pour continuer à commander à crédit, vous devez soumettre votre pièce d'identité.
+      </p>
+    </div>
+    <a href="{% url 'membres:profil' %}#kyc" class="btn-primary btn-sm" style="background:var(--amber);box-shadow:none;white-space:nowrap">
+      📤 Envoyer mes documents
+    </a>
+  </div>
+  {% endif %}
+
+  <!-- ══ En-tête avec score ═════════════════════════════════════════════════ -->
+  <div class="profile-header" style="margin-bottom:28px">
+    <div class="score-widget">
+      <div class="score-ring">
+        <svg viewBox="0 0 86 86">
+          <circle class="score-ring-bg" cx="43" cy="43" r="39"/>
+          <circle class="score-ring-fill" cx="43" cy="43" r="39"
+                  stroke-dasharray="{{ score_circumference }}"
+                  stroke-dashoffset="{{ score_offset }}"/>
+        </svg>
+        <div class="score-ring-text">
+          <div class="score-ring-num">{{ membre.score_confiance }}</div>
+          <div class="score-ring-sub">/ 100</div>
+        </div>
+      </div>
+      <div class="score-label-text">
+        <strong>Score : {{ score_label }}</strong>
+        <span>Bonjour, {{ membre.nom_complet }} 👋</span>
+      </div>
+    </div>
+    <div style="margin-left:auto;display:flex;flex-direction:column;align-items:flex-end;gap:8px">
+      {% if membre.kyc_statut == 'valide' %}
+        <span class="kyc-badge kyc-valide">✅ Identité vérifiée</span>
+      {% elif membre.kyc_statut == 'en_attente' %}
+        <span class="kyc-badge kyc-attente">⏳ Documents en cours de vérification</span>
+      {% elif membre.kyc_statut == 'rejete' %}
+        <span class="kyc-badge kyc-rejete">❌ KYC rejeté — <a href="{% url 'membres:profil' %}#kyc" style="color:inherit;text-decoration:underline">Renvoyer</a></span>
+      {% else %}
+        <span class="kyc-badge kyc-attente" style="background:#EEF1F8;color:#5A6A8F">🔵 KYC non soumis</span>
+      {% endif %}
+      <span style="color:rgba(255,255,255,0.55);font-size:12px">Code parrainage : <strong style="color:#fff">{{ membre.code_parrainage }}</strong></span>
+    </div>
+  </div>
+
+  <!-- ══ Statistiques ═══════════════════════════════════════════════════════ -->
+  <div class="stats-grid">
+    <div class="stat-card">
+      <div class="stat-card-icon">🛒</div>
+      <div class="stat-card-value">{{ stats.nb_commandes }}</div>
+      <div class="stat-card-label">Commandes totales</div>
+    </div>
+    <div class="stat-card blue">
+      <div class="stat-card-icon">⏳</div>
+      <div class="stat-card-value">{{ stats.nb_en_cours }}</div>
+      <div class="stat-card-label">En cours</div>
+    </div>
+    <div class="stat-card green">
+      <div class="stat-card-icon">👥</div>
+      <div class="stat-card-value">{{ stats.nb_filleuls }}</div>
+      <div class="stat-card-label">Filleuls actifs</div>
+    </div>
+    <div class="stat-card gold">
+      <div class="stat-card-icon">💰</div>
+      <div class="stat-card-value">{{ stats.solde_commissions }} F</div>
+      <div class="stat-card-label">Commissions</div>
+    </div>
+  </div>
+
+  <!-- ══ Grille principale ══════════════════════════════════════════════════ -->
+  <div class="dashboard-grid">
+
+    <!-- Dernières commandes -->
+    <div class="card">
+      <div class="card-header">
+        <h3>🛒 Mes dernières commandes</h3>
+        <a href="{% url 'commandes:mes_commandes' %}" class="btn-outline btn-sm">Voir tout</a>
+      </div>
+      <div class="card-body">
+        {% if commandes %}
+        <div class="table-wrap">
+          <table>
+            <thead><tr><th>Réf.</th><th>Pack</th><th>Mode</th><th>Total</th><th>Statut</th></tr></thead>
+            <tbody>
+            {% for cmd in commandes %}
+            <tr>
+              <td><a href="{% url 'commandes:detail' cmd.pk %}" style="color:var(--brand);font-weight:700">CMD-{{ cmd.pk|stringformat:"04d" }}</a></td>
+              <td>Pack {{ cmd.pack.code }}</td>
+              <td>
+                {% if cmd.mode_commande == 'cash' %}
+                  <span class="badge badge-green">💵 Comptant</span>
+                {% else %}
+                  <span class="badge badge-blue">💳 Crédit</span>
+                {% endif %}
+              </td>
+              <td>{{ cmd.montant_total }} F</td>
+              <td>
+                {% if cmd.statut == 'soldee' %}<span class="badge badge-green">Soldée</span>
+                {% elif cmd.statut == 'acompte_paye' %}<span class="badge badge-yellow">Acompte ✓</span>
+                {% elif cmd.statut == 'en_retard' %}<span class="badge badge-red">⚠️ Retard</span>
+                {% elif cmd.statut == 'annulee' %}<span class="badge badge-gray">Annulée</span>
+                {% else %}<span class="badge badge-blue">En attente</span>{% endif %}
+              </td>
+            </tr>
+            {% endfor %}
+            </tbody>
+          </table>
+        </div>
+        {% else %}
+        <div class="empty-state">
+          <div class="empty-icon">🛒</div>
+          <h4>Aucune commande</h4>
+          <p>Découvrez nos packs et passez votre première commande.</p>
+          <a href="{% url 'produits:catalogue' %}" class="btn-primary btn-sm">Voir les packs</a>
+        </div>
+        {% endif %}
+      </div>
+    </div>
+
+    <!-- Réseau & actions rapides -->
+    <div style="display:flex;flex-direction:column;gap:20px">
+
+      <!-- Bouton installer app -->
+      <button id="btnInstallPWA" style="display:none;align-items:center;gap:10px;background:linear-gradient(145deg,var(--brand-deep),var(--brand));color:#fff;border:none;padding:14px 18px;border-radius:var(--r-lg);cursor:pointer;font-weight:700;font-size:14px;width:100%">
+        📱 Installer l'application NETROVA
+      </button>
+
+      <!-- Code parrainage -->
+      <div class="card">
+        <div class="card-header"><h3>🔗 Mon lien de parrainage</h3></div>
+        <div class="card-body-pad">
+          <div class="ref-box">
+            <div class="ref-code">{{ membre.code_parrainage }}</div>
+            <div class="ref-link" id="refLink">/membres/inscription/?ref={{ membre.code_parrainage }}</div>
+          </div>
+          <button class="btn-copy" onclick="copyRef()">📋 Copier le lien</button>
+        </div>
+      </div>
+
+      <!-- Filleuls -->
+      <div class="card">
+        <div class="card-header">
+          <h3>👥 Mon réseau ({{ stats.nb_filleuls }})</h3>
+          <a href="{% url 'membres:mon_reseau' %}" class="btn-outline btn-sm">Arbre complet</a>
+        </div>
+        <div class="card-body">
+          {% if filleuls %}
+          <table>
+            <tbody>
+            {% for f in filleuls %}
+            <tr>
+              <td>{{ f.nom_complet }}</td>
+              <td style="color:var(--ink-faint);font-size:12px">{{ f.date_inscription|date:"d/m/Y" }}</td>
+            </tr>
+            {% endfor %}
+            </tbody>
+          </table>
+          {% else %}
+          <div class="empty-state" style="padding:24px">
+            <p>Aucun filleul pour l'instant.<br>Partagez votre code !</p>
+          </div>
+          {% endif %}
+        </div>
+      </div>
+
+      <!-- Commissions -->
+      {% if commissions %}
+      <div class="card">
+        <div class="card-header">
+          <h3>💰 Dernières commissions</h3>
+          <a href="{% url 'reseau:commissions' %}" class="btn-outline btn-sm">Tout voir</a>
+        </div>
+        <div class="card-body">
+          <table>
+            <tbody>
+            {% for c in commissions %}
+            <tr>
+              <td style="font-size:13px">CMD-{{ c.commande.pk|stringformat:"04d" }}</td>
+              <td style="color:var(--leaf-deep);font-weight:700">+{{ c.montant }} F</td>
+              <td>{% if c.statut == 'versee' %}<span class="badge badge-green">Versée</span>{% else %}<span class="badge badge-yellow">En attente</span>{% endif %}</td>
+            </tr>
+            {% endfor %}
+            </tbody>
+          </table>
+        </div>
+      </div>
+      {% endif %}
+
+    </div>
+  </div>
+</div>
+
+{% block extra_js %}
+<script>
+function copyRef() {
+  const link = window.location.origin + '/membres/inscription/?ref={{ membre.code_parrainage }}';
+  navigator.clipboard.writeText(link).then(() => {
+    const btn = document.querySelector('.btn-copy');
+    btn.textContent = '✅ Copié !';
+    setTimeout(() => btn.textContent = '📋 Copier le lien', 2000);
+  });
+}
+</script>
+{% endblock %}
+{% endblock %}
